@@ -1,0 +1,132 @@
+---
+import { Font } from 'astro:assets';
+import { SITE } from '../config/site';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import {
+  absolute,
+  breadcrumbList,
+  organization,
+  pagePath,
+  webPage,
+  website,
+  type Crumb,
+  type JsonLdNode,
+} from '../lib/seo';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Error pages set this so they never enter the index. */
+  noindex?: boolean;
+  /** Trail from the home page to this page, inclusive. Omit on the home page. */
+  breadcrumbs?: readonly Crumb[];
+  /** Page-specific structured data, merged into the site-wide graph. */
+  schema?: readonly JsonLdNode[];
+}
+
+const { title, description, noindex = false, breadcrumbs, schema = [] } = Astro.props;
+const canonical = absolute(pagePath(Astro.url.pathname));
+const fullTitle = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    organization(),
+    website(),
+    webPage({
+      url: canonical,
+      title: fullTitle,
+      description,
+      hasBreadcrumb: Boolean(breadcrumbs?.length),
+    }),
+    ...(breadcrumbs?.length ? [breadcrumbList(breadcrumbs, canonical)] : []),
+    ...schema,
+  ],
+};
+---
+
+<!doctype html>
+<html lang="pt-BR" data-theme="light" data-theme-pref="system">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    {SITE.googleVerification && (
+      <meta name="google-site-verification" content={SITE.googleVerification} />
+    )}
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png?v=1" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=1" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f0e11" media="(prefers-color-scheme: dark)" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={SITE.ogLocale} />
+    <meta name="twitter:card" content="summary" />
+    {!noindex && (
+      <script type="application/ld+json" set:html={JSON.stringify(graph)} is:inline></script>
+    )}
+
+    {/* Only the UI font is preloaded; the heading serif swaps in with metric-matched fallbacks. */}
+    <Font cssVariable="--font-figtree" preload />
+    <Font cssVariable="--font-newsreader" />
+
+    {/* Resolve the theme before first paint so dark-mode users never see a white flash. */}
+    <script is:inline>
+      (() => {
+        const KEY = 'mda:theme';
+        const root = document.documentElement;
+        const mq = window.matchMedia('(prefers-color-scheme: dark)');
+        const read = () => {
+          try {
+            const v = localStorage.getItem(KEY);
+            return v === 'light' || v === 'dark' ? v : 'system';
+          } catch {
+            return 'system';
+          }
+        };
+        const apply = (pref) => {
+          root.dataset.themePref = pref;
+          root.dataset.theme = pref === 'system' ? (mq.matches ? 'dark' : 'light') : pref;
+        };
+        window.__setThemePref = (pref) => {
+          try {
+            if (pref === 'system') localStorage.removeItem(KEY);
+            else localStorage.setItem(KEY, pref);
+          } catch {
+            /* storage unavailable: theme still applies for this page view */
+          }
+          apply(pref);
+        };
+        mq.addEventListener('change', () => {
+          if (read() === 'system') apply('system');
+        });
+        apply(read());
+      })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body class="flex min-h-dvh flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60] focus:rounded-pill focus:bg-surface focus:px-4 focus:py-2 focus:text-ink focus:shadow-md"
+    >
+      Pular para o conteúdo
+    </a>
+    <SiteHeader />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

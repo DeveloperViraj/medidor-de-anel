@@ -1,0 +1,15 @@
+---
+import { logoSvg } from '../lib/brand';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span
+  class:list={['inline-block [&>svg]:size-full', className]}
+  aria-hidden="true"
+  set:html={logoSvg()}
+/>

@@ -1,0 +1,814 @@
+---
+/**
+ * The ring sizer. Three ways in (a ring on a calibrated screen, a paper strip round the finger, or a
+ * number already known) and one result. Only the on-screen ring needs calibration.
+ *
+ * Markup only; behaviour lives in src/scripts/ring-sizer.ts. Everything works without storage:
+ * calibration is remembered when localStorage is available and simply asked for again when not.
+ */
+import { Icon } from 'astro-icon/components';
+---
+
+<section id="medidor" class="sizer" data-sizer aria-label="Medidor de anel">
+  <fieldset class="min-w-0">
+    <legend class="mb-2 text-sm font-semibold text-ink-2">Como você quer medir?</legend>
+    <div class="seg">
+      <label>
+        <input type="radio" name="method" value="ring" checked />
+        <Icon name="lucide:gem" class="seg-icon" aria-hidden="true" />
+        Com anel
+      </label>
+      <label>
+        <input type="radio" name="method" value="finger" />
+        <Icon name="lucide:hand" class="seg-icon" aria-hidden="true" />
+        Pelo dedo
+      </label>
+      <label>
+        <input type="radio" name="method" value="typed" />
+        <Icon name="lucide:keyboard" class="seg-icon" aria-hidden="true" />
+        Digitar
+      </label>
+    </div>
+  </fieldset>
+
+  {/* Step 1 of the ring method: calibrate the screen. */}
+  <div class="panel" data-panel="calibrate">
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">
+        1
+      </span>
+      <h2 class="step-title">Calibre a tela</h2>
+    </div>
+    <p class="step-text">
+      Encoste na tela um objeto de tamanho padrão e ajuste o desenho até ficar igual. É só uma vez
+      neste aparelho.
+    </p>
+    <p class="stale-note" data-stale-note hidden>
+      <Icon name="lucide:info" class="size-4 shrink-0" aria-hidden="true" />
+      <span>
+        O zoom ou a tela mudou desde a última calibração. Calibre de novo, leva 20 segundos.
+      </span>
+    </p>
+
+    <fieldset class="mt-4 min-w-0">
+      <legend class="sr-only">Objeto para calibrar</legend>
+      <div class="seg">
+        <label>
+          <input type="radio" name="cal-method" value="card" checked />
+          <Icon name="lucide:credit-card" class="seg-icon" aria-hidden="true" />
+          Cartão
+        </label>
+        <label>
+          <input type="radio" name="cal-method" value="coin" />
+          <Icon name="lucide:coins" class="seg-icon" aria-hidden="true" />
+          Moeda R$ 1
+        </label>
+        <label>
+          <input type="radio" name="cal-method" value="ruler" />
+          <Icon name="lucide:ruler" class="seg-icon" aria-hidden="true" />
+          Régua
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="stage" data-cal-stage>
+      <div class="cal-card" data-cal-shape="card">
+        <span class="cal-edge cal-edge-top" aria-hidden="true">
+          <span>borda de cima do cartão</span>
+        </span>
+        <span class="cal-edge cal-edge-bottom" aria-hidden="true">
+          <span>borda de baixo</span>
+        </span>
+        <span class="cal-card-body" aria-hidden="true"></span>
+      </div>
+      <div class="cal-coin" data-cal-shape="coin" hidden aria-hidden="true"></div>
+      <div class="cal-ruler-wrap" data-cal-shape="ruler" hidden aria-hidden="true">
+        <svg class="cal-ruler" data-cal-ruler></svg>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <button type="button" class="step-btn" data-cal-step="-1" aria-label="Diminuir o desenho">
+        <Icon name="lucide:minus" class="size-5" aria-hidden="true" />
+      </button>
+      <input
+        type="range"
+        class="range"
+        data-cal-range
+        min="2.5"
+        max="12"
+        step="0.001"
+        value="6"
+        aria-label="Tamanho do desenho na tela"
+      />
+      <button type="button" class="step-btn" data-cal-step="1" aria-label="Aumentar o desenho">
+        <Icon name="lucide:plus" class="size-5" aria-hidden="true" />
+      </button>
+    </div>
+    <p class="step-text" data-cal-hint="card">
+      Encoste um cartão de banco <strong>deitado</strong> na tela, com a borda de cima na linha de
+      cima. Ajuste até a linha de baixo coincidir com a borda de baixo. Pode passar das laterais.
+    </p>
+    <p class="step-text" data-cal-hint="coin" hidden>
+      Coloque uma moeda de <strong>R$ 1</strong> em cima do círculo e ajuste até ficar do mesmo
+      tamanho, sem sobrar borda.
+    </p>
+    <p class="step-text" data-cal-hint="ruler" hidden>
+      Encoste uma régua com o zero na primeira marca e ajuste até os centímetros coincidirem.
+    </p>
+    <p class="zoom-note" data-zoom-note hidden>
+      <Icon name="lucide:zoom-in" class="size-4 shrink-0" aria-hidden="true" />
+      <span>A página está com zoom. Faça o movimento de pinça para voltar ao tamanho normal.</span>
+    </p>
+    <button type="button" class="btn btn-solid mt-4 w-full sm:w-auto" data-cal-done>
+      <Icon name="lucide:check" class="size-5" aria-hidden="true" />
+      Pronto, ficou igual
+    </button>
+  </div>
+
+  {/* Step 2 of the ring method: match the circle to the ring. */}
+  <div class="panel" data-panel="ring" hidden>
+    <div class="cal-status">
+      <Icon name="lucide:circle-check" class="size-4 shrink-0 text-positive" aria-hidden="true" />
+      <span data-cal-summary>Tela calibrada.</span>
+      <button type="button" class="link-btn" data-recalibrate>
+        Calibrar de novo
+      </button>
+    </div>
+    <div class="step-head mt-4">
+      <span class="step-num" aria-hidden="true">
+        2
+      </span>
+      <h2 class="step-title">Coloque o anel no círculo</h2>
+    </div>
+    <p class="step-text">
+      Deite o anel na tela, em cima do círculo. Ajuste até a borda do círculo encostar na{' '}
+      <strong>parte de dentro</strong> do anel, sem aparecer dourado por dentro e sem o círculo
+      sumir embaixo do metal.
+    </p>
+
+    <div class="stage stage-ring" data-ring-stage>
+      <div class="ring-target" data-ring-circle aria-hidden="true">
+        <span class="ring-cross"></span>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <button type="button" class="step-btn" data-ring-step="-1" aria-label="Diminuir 0,1 mm">
+        <Icon name="lucide:minus" class="size-5" aria-hidden="true" />
+      </button>
+      <input
+        type="range"
+        class="range"
+        data-ring-range
+        min="12"
+        max="25"
+        step="0.05"
+        value="17.5"
+        aria-label="Diâmetro interno do anel"
+      />
+      <button type="button" class="step-btn" data-ring-step="1" aria-label="Aumentar 0,1 mm">
+        <Icon name="lucide:plus" class="size-5" aria-hidden="true" />
+      </button>
+    </div>
+    <p class="live-readout num" data-ring-live aria-hidden="true"></p>
+    <p class="zoom-note" data-zoom-note hidden>
+      <Icon name="lucide:zoom-in" class="size-4 shrink-0" aria-hidden="true" />
+      <span>A página está com zoom. Volte ao tamanho normal para a medida valer.</span>
+    </p>
+
+    <details class="check-box">
+      <summary>Conferir a calibração com uma régua</summary>
+      <p class="mt-2 text-sm text-ink-2">
+        Esta barra deve medir exatamente <strong data-check-label>3 cm</strong> numa régua. Se não
+        medir, calibre de novo.
+      </p>
+      <div class="check-bar" data-check-bar aria-hidden="true"></div>
+    </details>
+  </div>
+
+  {/* Finger method: a paper strip and a ruler; no calibration needed. */}
+  <div class="panel" data-panel="finger" hidden>
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">
+        1
+      </span>
+      <h2 class="step-title">Meça a volta do dedo</h2>
+    </div>
+    <ol class="finger-steps">
+      <li>
+        Recorte uma tira de papel de mais ou menos 1 cm de largura. Papel é melhor que barbante: não
+        estica.
+      </li>
+      <li>Enrole na base do dedo em que o anel vai ficar, firme mas sem apertar.</li>
+      <li>Marque com caneta onde a ponta encontra o papel e veja se a tira passa pela junta.</li>
+      <li>Estique a tira numa régua e meça do começo até a marca.</li>
+    </ol>
+    <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,14rem)_auto] sm:items-end">
+      <label class="block min-w-0">
+        <span class="mb-1.5 block text-sm font-semibold text-ink-2">Comprimento da tira</span>
+        <input
+          type="text"
+          inputmode="decimal"
+          autocomplete="off"
+          class="field"
+          placeholder="ex.: 5,6"
+          data-finger-input
+        />
+      </label>
+      <fieldset class="min-w-0">
+        <legend class="sr-only">Unidade</legend>
+        <div class="seg">
+          <label>
+            <input type="radio" name="finger-unit" value="cm" checked /> cm
+          </label>
+          <label>
+            <input type="radio" name="finger-unit" value="mm" /> mm
+          </label>
+        </div>
+      </fieldset>
+    </div>
+    <p class="field-msg" data-finger-msg aria-live="polite"></p>
+  </div>
+
+  {/* Typed method: a diameter or circumference from anywhere (a jeweller, a product page). */}
+  <div class="panel" data-panel="typed" hidden>
+    <div class="step-head">
+      <span class="step-num" aria-hidden="true">
+        1
+      </span>
+      <h2 class="step-title">Digite a medida que você tem</h2>
+    </div>
+    <fieldset class="mt-3 min-w-0">
+      <legend class="sr-only">Que medida é</legend>
+      <div class="seg">
+        <label>
+          <input type="radio" name="typed-kind" value="diameter" checked /> Diâmetro
+        </label>
+        <label>
+          <input type="radio" name="typed-kind" value="circumference" /> Circunferência
+        </label>
+      </div>
+    </fieldset>
+    <label class="mt-3 block max-w-56">
+      <span class="mb-1.5 block text-sm font-semibold text-ink-2">Medida em mm</span>
+      <input
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        class="field"
+        placeholder="ex.: 17,8"
+        data-typed-input
+      />
+    </label>
+    <p class="field-msg" data-typed-msg aria-live="polite"></p>
+  </div>
+
+  {/* The result, shared by every method. */}
+  <div class="result" data-result hidden>
+    <p class="eyebrow">Seu tamanho no Brasil</p>
+    <p class="aro-line">
+      <span class="aro-word">Aro</span>
+      <span class="aro-figure num" data-r-aro>
+        16
+      </span>
+    </p>
+    <p class="between-note" data-r-between hidden></p>
+    <p class="out-note" data-r-out hidden></p>
+
+    <dl class="metrics">
+      <div>
+        <dt>Diâmetro interno</dt>
+        <dd class="num" data-r-diameter></dd>
+      </div>
+      <div>
+        <dt>Circunferência</dt>
+        <dd class="num">
+          <span data-r-circumference></span>
+          <span class="metric-sub" data-r-circumference-cm></span>
+        </dd>
+      </div>
+    </dl>
+
+    <h3 class="result-sub">O mesmo tamanho lá fora</h3>
+    <dl class="intl">
+      <div>
+        <dt>EUA e Canadá</dt>
+        <dd class="num" data-r-us></dd>
+      </div>
+      <div>
+        <dt>Europa (ISO)</dt>
+        <dd class="num" data-r-iso></dd>
+      </div>
+      <div>
+        <dt>Reino Unido</dt>
+        <dd class="num" data-r-uk></dd>
+      </div>
+      <div>
+        <dt>Itália e Espanha</dt>
+        <dd class="num" data-r-it></dd>
+      </div>
+    </dl>
+
+    <div class="warn-box">
+      <p class="flex gap-2 font-semibold text-ink">
+        <Icon
+          name="lucide:triangle-alert"
+          class="mt-0.5 size-4 shrink-0 text-warn-ink"
+          aria-hidden="true"
+        />
+        Confira a tabela da loja antes de comprar
+      </p>
+      <p class="mt-1.5 text-sm text-ink-2">
+        Este aro segue a tabela da maioria das joalherias (volta em mm menos 40). Algumas lojas,
+        principalmente de semijoias e marketplaces, usam uma tabela por diâmetro em que o aro 16 tem
+        16,8 mm. Nessas lojas, este mesmo anel é o{' '}
+        <strong class="text-ink" data-r-scale-b>
+          aro 19
+        </strong>
+        .
+      </p>
+      <details class="store-check" data-store>
+        <summary>Descobrir qual tabela a loja usa</summary>
+        <p class="mt-2 text-sm text-ink-2">
+          Abra a tabela de medidas da loja, escolha qualquer aro e copie a medida dele aqui.
+        </p>
+        <div class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-[6rem_minmax(0,9rem)_minmax(0,1fr)] sm:items-end">
+          <label class="block min-w-0">
+            <span class="mb-1.5 block text-sm font-semibold text-ink-2">Aro da loja</span>
+            <input
+              type="text"
+              inputmode="numeric"
+              autocomplete="off"
+              class="field"
+              placeholder="16"
+              data-store-aro
+            />
+          </label>
+          <label class="block min-w-0">
+            <span class="mb-1.5 block text-sm font-semibold text-ink-2">Medida</span>
+            <input
+              type="text"
+              inputmode="decimal"
+              autocomplete="off"
+              class="field"
+              placeholder="16,8"
+              data-store-mm
+            />
+          </label>
+          <label class="block min-w-0">
+            <span class="mb-1.5 block text-sm font-semibold text-ink-2">A medida é</span>
+            <select class="field" data-store-kind>
+              <option value="diameter">mm de diâmetro</option>
+              <option value="circumference">mm de volta</option>
+              <option value="circumference-cm">cm de volta</option>
+            </select>
+          </label>
+        </div>
+        <p class="store-answer" data-store-answer aria-live="polite"></p>
+      </details>
+    </div>
+
+    <ul class="tips">
+      <li>Ficou entre dois aros? Escolha o maior. É mais fácil apertar um anel do que alargar.</li>
+      <li>Alianças largas (6 mm ou mais) ficam mais justas: considere um aro acima.</li>
+      <li>
+        Meça no fim do dia, com a mão em temperatura normal. De manhã e no frio o dedo fica menor.
+      </li>
+    </ul>
+
+    <div class="mt-5 flex flex-wrap gap-2">
+      <button type="button" class="btn btn-ghost btn-sm" data-copy-link>
+        <Icon name="lucide:link" class="size-4" aria-hidden="true" />
+        <span data-copy-label>Copiar link do resultado</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-sm" data-restart>
+        <Icon name="lucide:rotate-ccw" class="size-4" aria-hidden="true" />
+        Medir de novo
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initRingSizer } from '../scripts/ring-sizer';
+
+  const root = document.querySelector<HTMLElement>('[data-sizer]');
+  if (root) initRingSizer(root);
+</script>
+
+<style>
+  .sizer {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (min-width: 640px) {
+    .sizer {
+      padding: 1.5rem;
+    }
+  }
+
+  .panel[hidden],
+  .result[hidden] {
+    display: none;
+  }
+
+  .step-head {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  .step-num {
+    display: inline-flex;
+    flex: none;
+    width: 1.75rem;
+    height: 1.75rem;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-pill);
+    background: var(--color-gold-soft);
+    color: var(--color-gold-ink);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .step-title {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+  }
+
+  .step-text {
+    margin-top: 0.5rem;
+    color: var(--color-ink-2);
+  }
+
+  .step-text strong {
+    color: var(--color-ink);
+  }
+
+  /*
+   * The measuring stage. Shapes are sized in CSS px from the calibration, never in rem, so text
+   * scaling cannot change them. Overflow is clipped: a card wider than the phone is expected.
+   */
+  .stage {
+    position: relative;
+    /* Flex, not grid: a card wider than the stage then spills equally off both sides. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 15rem;
+    margin-top: 1rem;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--color-sunken);
+    border: 1px solid var(--color-line);
+    touch-action: pan-y;
+  }
+
+  .stage-ring {
+    min-height: 13.5rem;
+  }
+
+  .cal-card {
+    position: relative;
+    flex: none;
+  }
+
+  .cal-card-body {
+    position: absolute;
+    inset: 0;
+    border-radius: 3px;
+    background: color-mix(in oklch, var(--color-gold) 18%, transparent);
+    border: 1px dashed var(--color-gold-strong);
+  }
+
+  /* The two edges that matter: full-width lines, so they stay visible when the card overflows. */
+  .cal-edge {
+    position: absolute;
+    left: -100vw;
+    right: -100vw;
+    height: 0;
+    border-top: 2px solid var(--color-accent);
+    z-index: 1;
+  }
+
+  .cal-edge-top {
+    top: -1px;
+  }
+
+  .cal-edge-bottom {
+    bottom: -1px;
+  }
+
+  /* Small labels on each line, centred: the card is centred in the stage, so this is always visible. */
+  .cal-edge > span {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0 0.375rem;
+    border-radius: var(--radius-xs);
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+    font-size: 0.6875rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1.125rem;
+    white-space: nowrap;
+  }
+
+  .cal-edge-top > span {
+    top: 0.25rem;
+  }
+
+  .cal-edge-bottom > span {
+    bottom: 0.25rem;
+  }
+
+  .seg-icon {
+    width: 1rem;
+    height: 1rem;
+    flex: none;
+  }
+
+  @media (max-width: 419px) {
+    .seg-icon {
+      display: none;
+    }
+  }
+
+  .cal-coin,
+  .ring-target {
+    position: relative;
+    flex: none;
+    border-radius: 50%;
+    background: color-mix(in oklch, var(--color-gold) 38%, transparent);
+    box-shadow: inset 0 0 0 1.5px var(--color-gold-strong);
+  }
+
+  .ring-cross::before,
+  .ring-cross::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    background: var(--color-gold-strong);
+    opacity: 0.7;
+    transform: translate(-50%, -50%);
+  }
+
+  .ring-cross::before {
+    width: 14px;
+    height: 1px;
+  }
+
+  .ring-cross::after {
+    width: 1px;
+    height: 14px;
+  }
+
+  .cal-ruler-wrap {
+    position: absolute;
+    inset: 0;
+  }
+
+  .cal-ruler-wrap[hidden] {
+    display: none;
+  }
+
+  .cal-ruler {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: visible;
+    color: var(--color-ink);
+  }
+
+  .slider-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+
+  .live-readout {
+    margin-top: 0.25rem;
+    text-align: center;
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .cal-status {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.375rem 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+  }
+
+  .link-btn {
+    color: var(--color-accent-ink);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .stale-note,
+  .zoom-note {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin-top: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-warn-soft);
+    border: 1px solid var(--color-warn-line);
+    color: var(--color-warn-ink);
+    font-size: var(--text-sm);
+  }
+
+  .stale-note[hidden],
+  .zoom-note[hidden] {
+    display: none;
+  }
+
+  .stale-note :global(svg),
+  .zoom-note :global(svg) {
+    margin-top: 0.2rem;
+  }
+
+  .check-box {
+    margin-top: 1rem;
+    font-size: var(--text-sm);
+  }
+
+  .check-box summary,
+  .store-check summary {
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-accent-ink);
+  }
+
+  .check-bar {
+    height: 10px;
+    margin-top: 0.5rem;
+    border-radius: 2px;
+    background: var(--color-ink);
+  }
+
+  .finger-steps {
+    margin-top: 0.75rem;
+    padding-left: 1.25rem;
+    list-style: decimal;
+    color: var(--color-ink-2);
+  }
+
+  .finger-steps li + li {
+    margin-top: 0.375rem;
+  }
+
+  .field-msg {
+    min-height: 1.375rem;
+    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-danger);
+  }
+
+  .result {
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .aro-line {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+  }
+
+  .aro-word {
+    font-size: var(--text-3xl);
+    color: var(--color-ink-2);
+  }
+
+  .aro-figure {
+    font-size: var(--text-figure);
+    line-height: var(--text-figure--line-height);
+    letter-spacing: var(--text-figure--letter-spacing);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .between-note,
+  .out-note {
+    margin-top: 0.5rem;
+    color: var(--color-ink-2);
+  }
+
+  .between-note[hidden],
+  .out-note[hidden] {
+    display: none;
+  }
+
+  .metrics,
+  .intl {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .intl {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .metrics > div,
+  .intl > div {
+    min-width: 0;
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-sunken);
+  }
+
+  .metrics dt,
+  .intl dt {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    color: var(--color-ink-3);
+  }
+
+  .metrics dd {
+    margin-top: 0.125rem;
+    font-size: var(--text-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .metric-sub {
+    display: block;
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-ink-3);
+  }
+
+  .intl dd {
+    margin-top: 0.125rem;
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .result-sub {
+    margin-top: 1.5rem;
+    font-size: var(--text-lg);
+    line-height: var(--text-lg--line-height);
+  }
+
+  .warn-box {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--color-warn-soft);
+    border: 1px solid var(--color-warn-line);
+  }
+
+  .store-check {
+    margin-top: 0.75rem;
+  }
+
+  .store-answer {
+    margin-top: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .store-answer:empty {
+    display: none;
+  }
+
+  .tips {
+    margin-top: 1.25rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+  }
+
+  .tips li + li {
+    margin-top: 0.375rem;
+  }
+</style>

@@ -1,0 +1,258 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RingSizer from '../components/RingSizer.astro';
+import { SITE } from '../config/site';
+import { formatMm, formatMm2 } from '../lib/format';
+import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
+import { aroTable } from '../lib/sizes';
+
+const title = 'Medidor de Anel Online Grátis – Meça na Tela do Celular';
+const description =
+  'Descubra o seu aro na tela do celular com um cartão ou uma moeda de R$ 1. Grátis, sem cadastro e sem app, com a medida em mm e o tamanho nos EUA e na Europa.';
+
+const rows = aroTable(10, 30);
+
+const faqs: Faq[] = [
+  {
+    q: 'O medidor de anel na tela do celular é confiável?',
+    a: 'Sim, desde que a tela seja calibrada. Nenhum navegador sabe o tamanho físico da própria tela, por isso pedimos para você ajustar o desenho a um cartão ou a uma moeda de R$ 1. Depois disso, cada milímetro na tela é um milímetro de verdade. Medir um anel que já serve costuma ser mais preciso do que medir o dedo.',
+  },
+  {
+    q: 'Que cartão posso usar para calibrar?',
+    a: 'Qualquer cartão de banco, de crédito ou de débito: eles seguem a norma internacional ISO/IEC 7810 ID-1 e medem 85,6 × 53,98 mm. Cartões de transporte e de plano de saúde normalmente têm o mesmo tamanho. Também dá para calibrar com uma moeda de R$ 1, que tem 27 mm, ou com uma régua.',
+  },
+  {
+    q: 'Aro 16 tem quantos milímetros?',
+    a: 'Na tabela da maioria das joalherias, o aro 16 tem 56 mm de volta (5,6 cm) e 17,8 mm de diâmetro interno. A regra é simples: o número do aro é a volta em milímetros menos 40.',
+  },
+  {
+    q: 'Por que a loja diz um aro diferente do que deu aqui?',
+    a: 'Porque no Brasil existem duas tabelas. A da maioria das joalherias usa a volta em mm menos 40. Algumas lojas, principalmente de semijoias e marketplaces, usam uma tabela por diâmetro em que o mesmo anel fica cerca de 3 números acima. Por isso mostramos o diâmetro em milímetros e uma ferramenta para descobrir qual tabela a loja usa.',
+  },
+  {
+    q: 'Como medir o tamanho do anel sem ter um anel?',
+    a: 'Escolha "Pelo dedo": enrole uma tira de papel na base do dedo, marque onde ela se encontra e meça com uma régua. Papel é melhor que barbante, porque não estica. Digite o comprimento e o aro aparece na hora.',
+  },
+  {
+    q: 'Funciona no computador?',
+    a: 'Funciona. Encoste o cartão ou a moeda no monitor para calibrar, ou use o método pelo dedo com uma régua. No celular costuma ser mais prático, porque dá para deitar o anel em cima da tela.',
+  },
+  {
+    q: 'Vocês guardam as minhas medidas?',
+    a: 'Não. A medida é calculada no seu aparelho e não é enviada para lugar nenhum. A calibração fica guardada só no seu navegador, para você não precisar repetir na próxima vez.',
+  },
+];
+
+const schema = [
+  webApplication({
+    url: absolute('/'),
+    name: 'Medidor de anel online',
+    description,
+  }),
+  faqPage(absolute('/'), faqs),
+];
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <div class="mx-auto max-w-3xl px-4 pt-8 sm:pt-12">
+    <p class="eyebrow">Grátis · sem cadastro · sem app</p>
+    <h1 class="mt-2 text-4xl sm:text-5xl">Medidor de anel online</h1>
+    <p class="mt-3 text-lg text-ink-2">
+      Descubra o seu aro na tela do celular: calibre com um cartão ou uma moeda de R$ 1, coloque um
+      anel no círculo e veja o número na hora.
+    </p>
+
+    <div class="mt-6">
+      <RingSizer />
+    </div>
+
+    <article class="prose-pt mt-14">
+      <h2>Como o medidor de anel virtual funciona</h2>
+      <p>
+        Um medidor na tela só acerta se souber quantos pixels a sua tela tem por milímetro, e isso
+        muda de aparelho para aparelho. Por isso o primeiro passo é a calibração:
+      </p>
+      <ol>
+        <li>
+          <strong>Calibrar.</strong> Você encosta na tela um objeto de tamanho padrão (um cartão,
+          uma moeda de R$ 1 ou uma régua) e ajusta o desenho até ficar igual. Fica guardado no
+          aparelho.
+        </li>
+        <li>
+          <strong>Medir.</strong> Deite um anel que já serve em cima do círculo e ajuste até a borda
+          encostar na parte de dentro do anel. Sem anel? Meça o dedo com uma tira de papel.
+        </li>
+        <li>
+          <strong>Ver o aro.</strong> O resultado mostra o aro brasileiro, o diâmetro e a volta em
+          milímetros e o tamanho nos Estados Unidos, na Europa e no Reino Unido.
+        </li>
+      </ol>
+      <p>
+        Se você mudar o zoom do navegador ou trocar de tela, o medidor percebe e pede para calibrar
+        de novo, porque a medida antiga deixaria de valer.
+      </p>
+
+      <h2>Qual tabela de aro o medidor usa</h2>
+      <p>
+        Usamos a tabela da maioria das joalherias brasileiras, a mesma do guia de medidas da Vivara
+        e de fabricantes de alianças:{' '}
+        <strong>o número do aro é a volta do dedo em milímetros menos 40</strong>. Uma volta de 5,6
+        cm (56 mm) é o aro 16; uma de 6,2 cm é o aro 22. Itália, Espanha e Suíça numeram do mesmo
+        jeito.
+      </p>
+      <p>
+        Existe uma segunda tabela, comum em semijoias e em anúncios de marketplace, que numera pelo
+        diâmetro: nela o aro 16 tem 16,8 mm por dentro, em vez de 17,8 mm. O mesmo anel acaba
+        ficando 2 a 3 números acima. Nenhuma das duas está errada, mas misturar as duas é a causa
+        mais comum de anel que chega apertado. Por isso o resultado sempre mostra os milímetros e
+        oferece um teste para descobrir qual tabela a loja usa.
+      </p>
+
+      <h2>Tabela de aros: diâmetro e volta em mm</h2>
+      <p>
+        Aros mais usados, na tabela padrão. Para comparar com outra loja, use o diâmetro interno em
+        milímetros.
+      </p>
+      <div class="table-wrap">
+        <table class="aro-table">
+          <thead>
+            <tr>
+              <th scope="col">Aro</th>
+              <th scope="col">Diâmetro interno</th>
+              <th scope="col">Volta</th>
+              <th scope="col">EUA</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map((row) => (
+              <tr>
+                <th scope="row">{row.aro}</th>
+                <td class="num">{formatMm2(row.diameterMm)} mm</td>
+                <td class="num">
+                  {row.circumferenceMm} mm{' '}
+                  <span class="cell-sub">{formatMm(row.circumferenceMm / 10)} cm</span>
+                </td>
+                <td class="num">{row.us}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Dicas para acertar o tamanho</h2>
+      <ul>
+        <li>
+          <strong>Meça no fim do dia</strong>, com a mão em temperatura normal. De manhã, no frio ou
+          logo depois de exercício a medida engana.
+        </li>
+        <li>
+          <strong>Papel em vez de barbante.</strong> Barbante estica e, puxado com força, dá uma
+          medida menor que o dedo.
+        </li>
+        <li>
+          <strong>Pense na junta.</strong> O anel precisa passar por ela. Se a junta for bem mais
+          grossa que a base do dedo, meça as duas e fique com a medida da junta.
+        </li>
+        <li>
+          <strong>Alianças largas ficam mais justas.</strong> A partir de uns 6 mm de largura, vale
+          experimentar um aro acima.
+        </li>
+        <li>
+          <strong>Ficou entre dois números?</strong> Escolha o maior. Atenção: anéis de aço inox
+          normalmente não podem ser ajustados depois.
+        </li>
+        <li>
+          <strong>Meça o dedo certo.</strong> Cada dedo tem um tamanho, e a mão que você mais usa
+          costuma ser um pouco maior.
+        </li>
+      </ul>
+
+      <h2>Perguntas frequentes</h2>
+      <div class="faq">
+        {faqs.map((f) => (
+          <details>
+            <summary>{f.q}</summary>
+            <p>{f.a}</p>
+          </details>
+        ))}
+      </div>
+
+      <p class="mt-10 text-sm text-ink-3">
+        {SITE.name} é um projeto independente: não vendemos joias e não somos ligados a nenhuma
+        loja.
+      </p>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .aro-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .aro-table th,
+  .aro-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-line);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .aro-table th,
+    .aro-table td {
+      padding: 0.5rem 0.875rem;
+    }
+  }
+
+  .cell-sub {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+  }
+
+  .aro-table thead th {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink-3);
+    background: var(--color-surface-2);
+  }
+
+  .aro-table tbody th {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--color-ink);
+  }
+
+  .aro-table tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .aro-table td {
+    color: var(--color-ink-2);
+  }
+
+  .faq details {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.875rem 0;
+  }
+
+  .faq summary {
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .faq details p {
+    margin: 0.5rem 0 0;
+  }
+</style>

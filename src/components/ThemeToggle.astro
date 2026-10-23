@@ -1,0 +1,44 @@
+---
+/**
+ * Light or dark, nothing else. A first visit follows the device's setting; a click switches to the
+ * other theme and remembers it. The icon shows the theme a click switches to.
+ */
+import { Icon } from 'astro-icon/components';
+---
+
+<button
+  type="button"
+  class="theme-toggle inline-flex size-10 items-center justify-center rounded-pill text-ink-2 transition-colors hover:bg-sunken hover:text-ink"
+  data-theme-toggle
+  aria-label="Mudar para o tema escuro"
+  title="Mudar o tema"
+>
+  <Icon name="lucide:moon" class="icon-to-dark size-[18px]" aria-hidden="true" />
+  <Icon name="lucide:sun" class="icon-to-light size-[18px]" aria-hidden="true" />
+</button>
+
+<style>
+  .theme-toggle :global(svg) {
+    display: none;
+  }
+  :global(html:not([data-theme='dark'])) .theme-toggle :global(.icon-to-dark),
+  :global(html[data-theme='dark']) .theme-toggle :global(.icon-to-light) {
+    display: block;
+  }
+</style>
+
+<script>
+  const isDark = () => document.documentElement.dataset.theme === 'dark';
+
+  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
+    const sync = () =>
+      btn.setAttribute('aria-label', `Mudar para o tema ${isDark() ? 'claro' : 'escuro'}`);
+    sync();
+    btn.addEventListener('click', () => {
+      window.__setThemePref?.(isDark() ? 'light' : 'dark');
+      sync();
+    });
+    // A first-time visitor's theme follows the device, which can change while the page is open.
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', sync);
+  }
+</script>

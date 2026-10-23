@@ -1,0 +1,456 @@
+@import 'tailwindcss';
+
+/*
+ * Tailwind's default palette and type scale are cleared so stray `bg-blue-500` or `text-9xl`
+ * classes fail to compile instead of drifting the design.
+ */
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+@theme {
+  --color-*: initial;
+  --color-white: #fff;
+  --color-black: #000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* A cool, barely-violet white: jewellery-box paper, not cream. */
+  --color-canvas: oklch(0.985 0.003 300);
+  --color-canvas-2: oklch(0.968 0.005 300);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.978 0.004 300);
+  --color-sunken: oklch(0.958 0.006 300);
+
+  /* Plum ink. */
+  --color-ink: oklch(0.22 0.035 305);
+  --color-ink-2: oklch(0.41 0.03 305);
+  --color-ink-3: oklch(0.52 0.024 305);
+
+  --color-line: oklch(0.912 0.009 305);
+  --color-line-strong: oklch(0.84 0.014 305);
+
+  /* Accent: vinho (garnet). Deep enough for white text above 4.5:1. */
+  --color-accent: oklch(0.47 0.155 12);
+  --color-accent-strong: oklch(0.42 0.145 12);
+  --color-accent-ink: oklch(0.46 0.15 12);
+  --color-accent-soft: oklch(0.966 0.018 12);
+  --color-accent-soft-2: oklch(0.925 0.04 12);
+  --color-on-accent: oklch(1 0 0);
+
+  /* Gold: the ring itself and small ornament. Never small text on white; use gold-ink for that. */
+  --color-gold: oklch(0.8 0.125 84);
+  --color-gold-strong: oklch(0.72 0.135 78);
+  --color-gold-soft: oklch(0.962 0.035 90);
+  --color-gold-ink: oklch(0.5 0.1 72);
+
+  --color-positive: oklch(0.49 0.11 155);
+  --color-positive-soft: oklch(0.962 0.03 155);
+
+  --color-warn-soft: oklch(0.972 0.035 88);
+  --color-warn-line: oklch(0.86 0.085 82);
+  --color-warn-ink: oklch(0.42 0.085 62);
+  --color-danger: oklch(0.53 0.19 27);
+  --color-danger-soft: oklch(0.965 0.025 20);
+
+  --text-*: initial;
+  --text-xs: 0.75rem;
+  --text-xs--line-height: 1.125rem;
+  --text-sm: 0.875rem;
+  --text-sm--line-height: 1.375rem;
+  --text-base: 1rem;
+  --text-base--line-height: 1.55rem;
+  --text-lg: 1.125rem;
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.25rem;
+  --text-xl--line-height: 1.75rem;
+  --text-2xl: 1.5rem;
+  --text-2xl--line-height: 2rem;
+  --text-3xl: 1.875rem;
+  --text-3xl--line-height: 2.25rem;
+  --text-4xl: 2.25rem;
+  --text-4xl--line-height: 2.5rem;
+  --text-5xl: 3rem;
+  --text-5xl--line-height: 1.05;
+  --text-6xl: 3.75rem;
+  --text-6xl--line-height: 1.02;
+  /* The aro number: the one thing people came for. */
+  --text-figure: clamp(4.5rem, 3.4rem + 5vw, 6.5rem);
+  --text-figure--line-height: 0.9;
+  --text-figure--letter-spacing: -0.03em;
+
+  --font-weight-*: initial;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --tracking-tight: -0.02em;
+  --tracking-normal: 0;
+  --tracking-wide: 0.06em;
+
+  --radius-*: initial;
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+
+  --shadow-*: initial;
+  --shadow-xs: 0 1px 2px oklch(0.22 0.04 305 / 0.06);
+  --shadow-sm: 0 1px 2px oklch(0.22 0.04 305 / 0.05), 0 2px 8px -2px oklch(0.22 0.04 305 / 0.07);
+  --shadow-md:
+    0 2px 4px -1px oklch(0.22 0.04 305 / 0.05), 0 14px 28px -10px oklch(0.22 0.04 305 / 0.14);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-1: 120ms;
+  --duration-2: 200ms;
+  --duration-3: 420ms;
+}
+
+@theme inline {
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-newsreader), Georgia, serif;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+  /* Near-black, nearly neutral surfaces; depth from small lightness steps and hairlines. */
+  --color-canvas: oklch(0.155 0.004 300);
+  --color-canvas-2: oklch(0.175 0.005 300);
+  --color-surface: oklch(0.19 0.006 300);
+  --color-surface-2: oklch(0.215 0.007 300);
+  --color-sunken: oklch(0.17 0.005 300);
+
+  --color-ink: oklch(0.96 0.004 300);
+  --color-ink-2: oklch(0.8 0.008 300);
+  --color-ink-3: oklch(0.67 0.01 300);
+
+  --color-line: oklch(0.285 0.008 300);
+  --color-line-strong: oklch(0.37 0.01 300);
+
+  --color-accent: oklch(0.74 0.13 12);
+  --color-accent-strong: oklch(0.79 0.12 12);
+  --color-accent-ink: oklch(0.8 0.11 12);
+  --color-accent-soft: oklch(0.24 0.03 12);
+  --color-accent-soft-2: oklch(0.29 0.05 12);
+  --color-on-accent: oklch(0.17 0.03 12);
+
+  --color-gold: oklch(0.82 0.12 84);
+  --color-gold-strong: oklch(0.86 0.11 86);
+  --color-gold-soft: oklch(0.25 0.03 85);
+  --color-gold-ink: oklch(0.86 0.1 86);
+
+  --color-positive: oklch(0.8 0.13 155);
+  --color-positive-soft: oklch(0.25 0.03 155);
+
+  --color-warn-soft: oklch(0.25 0.03 75);
+  --color-warn-line: oklch(0.46 0.08 75);
+  --color-warn-ink: oklch(0.88 0.09 85);
+  --color-danger: oklch(0.72 0.15 27);
+  --color-danger-soft: oklch(0.26 0.04 25);
+
+  --shadow-xs: 0 1px 2px oklch(0 0 0 / 0.4);
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.35), 0 2px 8px -2px oklch(0 0 0 / 0.4);
+  --shadow-md: 0 2px 4px -1px oklch(0 0 0 / 0.4), 0 14px 28px -10px oklch(0 0 0 / 0.55);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Long Portuguese words and pasted numbers must wrap, never widen the page. */
+    overflow-wrap: break-word;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-tight);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: var(--color-accent-ink);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: var(--color-gold-soft);
+    color: var(--color-ink);
+  }
+
+  [data-theme='dark'] ::selection {
+    background: oklch(0.4 0.06 85);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .num {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .eyebrow {
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--color-gold-ink);
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.625rem 1.125rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid transparent;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--text-base);
+    line-height: 1.25;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+      background-color var(--duration-1),
+      border-color var(--duration-1),
+      color var(--duration-1);
+  }
+
+  .btn-solid {
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .btn-solid:hover {
+    background: var(--color-accent-strong);
+  }
+
+  .btn-ghost {
+    background: var(--color-surface);
+    border-color: var(--color-line-strong);
+    color: var(--color-ink);
+  }
+
+  .btn-ghost:hover {
+    background: var(--color-sunken);
+  }
+
+  .btn-sm {
+    min-height: 2.25rem;
+    padding: 0.375rem 0.875rem;
+    font-size: var(--text-sm);
+  }
+
+  /* Round −/+ steppers beside a slider: big enough for a thumb. */
+  .step-btn {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  .step-btn:hover {
+    background: var(--color-sunken);
+  }
+
+  /* Segmented control: a radio group dressed as tabs. */
+  .seg {
+    display: grid;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-auto-flow: column;
+    gap: 0.25rem;
+    padding: 0.25rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-sunken);
+    border: 1px solid var(--color-line);
+  }
+
+  .seg label {
+    display: flex;
+    min-height: 2.5rem;
+    min-width: 0;
+    align-items: center;
+    justify-content: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.5rem;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-sm);
+    line-height: 1.2;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+    color: var(--color-ink-2);
+    cursor: pointer;
+  }
+
+  .seg input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .seg label:has(input:checked) {
+    background: var(--color-surface);
+    color: var(--color-ink);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .seg label:has(input:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
+  }
+
+  .field {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.875rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-line-strong);
+    background: var(--color-surface);
+    color: var(--color-ink);
+    font-size: 1.125rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .field:focus {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 0;
+    border-color: transparent;
+  }
+
+  /* A slider with a thumb large enough for a finger and a visible track in both themes. */
+  .range {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    min-width: 0;
+    height: 2.75rem;
+    background: transparent;
+    cursor: pointer;
+    touch-action: pan-y;
+  }
+
+  .range::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-line-strong);
+  }
+
+  .range::-moz-range-track {
+    height: 6px;
+    border-radius: var(--radius-pill);
+    background: var(--color-line-strong);
+  }
+
+  .range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 28px;
+    height: 28px;
+    margin-top: -11px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .range::-moz-range-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-surface);
+    border: 2px solid var(--color-accent);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .prose-pt {
+    color: var(--color-ink-2);
+  }
+
+  .prose-pt h2 {
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    font-size: var(--text-3xl);
+    line-height: var(--text-3xl--line-height);
+    color: var(--color-ink);
+  }
+
+  .prose-pt h3 {
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    font-size: var(--text-xl);
+    line-height: var(--text-xl--line-height);
+    color: var(--color-ink);
+  }
+
+  .prose-pt p,
+  .prose-pt ul,
+  .prose-pt ol {
+    margin-bottom: 1rem;
+  }
+
+  .prose-pt ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+
+  .prose-pt ol {
+    list-style: decimal;
+    padding-left: 1.25rem;
+  }
+
+  .prose-pt li + li {
+    margin-top: 0.375rem;
+  }
+
+  .prose-pt strong {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+}
