@@ -8,8 +8,8 @@
 /_astro/*
   Cache-Control: public, max-age=31536000, immutable
 
-# Only medidordeanel.com is indexed. The medidordeanel.pages.dev address and every deployment's
-# own <hash>.medidordeanel.pages.dev copy stay out of search results.
+# Only medidordeanel.com is indexed. The medidor-de-anel.pages.dev address and every deployment's
+# own <hash>.medidor-de-anel.pages.dev copy stay out of search results.
 https://:project.pages.dev/*
   X-Robots-Tag: noindex
 https://:version.:project.pages.dev/*

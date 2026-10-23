@@ -49,6 +49,14 @@ import { Icon } from 'astro-icon/components';
         O zoom ou a tela mudou desde a última calibração. Calibre de novo, leva 20 segundos.
       </span>
     </p>
+    <p class="stale-note" data-desktop-note hidden>
+      <Icon name="lucide:info" class="size-4 shrink-0" aria-hidden="true" />
+      <span>
+        O navegador está mostrando a versão para computador, que deixa tudo pequeno. O medidor
+        funciona assim, mas fica mais fácil se você desmarcar "Site para computador" (ou "Versão
+        para computador") no menu do navegador.
+      </span>
+    </p>
 
     <fieldset class="mt-4 min-w-0">
       <legend class="sr-only">Objeto para calibrar</legend>
@@ -124,6 +132,7 @@ import { Icon } from 'astro-icon/components';
       <Icon name="lucide:check" class="size-5" aria-hidden="true" />
       Pronto, ficou igual
     </button>
+    <p class="field-msg" data-cal-msg aria-live="polite"></p>
   </div>
 
   {/* Step 2 of the ring method: match the circle to the ring. */}

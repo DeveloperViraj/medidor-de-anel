@@ -7,6 +7,7 @@ import {
   parseCalibration,
   pxPerMmFrom,
   sameScreen,
+  zoomMoved,
   type ScreenFingerprint,
 } from './calibration';
 import { formatCm, formatMm, parseDecimal } from './format';
@@ -40,6 +41,26 @@ describe('calibration objects', () => {
     expect(isPlausiblePxPerMm(1.2)).toBe(false);
     expect(isPlausiblePxPerMm(30)).toBe(false);
   });
+
+  // A 360 px wide phone in "desktop site" mode: a 980 px layout shrunk to fit, zoom 360/980.
+  it('judges desktop-site mode by on-screen pixels', () => {
+    const zoom = 360 / 980;
+    const cssPxPerMm = 5.32 / zoom; // the phone's real 5,32 on-screen px per mm
+    expect(cssPxPerMm).toBeGreaterThan(14);
+    expect(isPlausiblePxPerMm(cssPxPerMm)).toBe(false);
+    expect(isPlausiblePxPerMm(cssPxPerMm, zoom)).toBe(true);
+  });
+});
+
+describe('zoomMoved', () => {
+  it('ignores rounding and notices pinch-zoom or a mode change', () => {
+    expect(zoomMoved(1, 1)).toBe(false);
+    expect(zoomMoved(1, 1.015)).toBe(false);
+    expect(zoomMoved(1, 1.5)).toBe(true);
+    expect(zoomMoved(0.367, 0.367)).toBe(false);
+    expect(zoomMoved(0.367, 1)).toBe(true);
+    expect(zoomMoved(1, 0.367)).toBe(true);
+  });
 });
 
 describe('sameScreen', () => {
@@ -72,6 +93,7 @@ describe('parseCalibration', () => {
     pxPerMm: 6.1,
     method: 'card',
     screen: { dpr: 3, shortSide: 390, longSide: 844, viewportRatio: 1 },
+    zoom: 1,
   };
 
   it('accepts what we store', () => {
@@ -81,12 +103,25 @@ describe('parseCalibration', () => {
     ).not.toBeNull();
   });
 
+  it('reads calibrations saved before the zoom was recorded as zoom 1', () => {
+    const { zoom: _zoom, ...old } = good;
+    expect(parseCalibration(old)?.zoom).toBe(1);
+  });
+
+  it('accepts a desktop-site calibration, judged at its own zoom', () => {
+    const desktopSite = { ...good, pxPerMm: 14.5, zoom: 0.367 };
+    expect(parseCalibration(desktopSite)).toEqual(desktopSite);
+    expect(parseCalibration({ ...desktopSite, zoom: 1 })).toBeNull();
+  });
+
   it('rejects junk', () => {
     expect(parseCalibration(null)).toBeNull();
     expect(parseCalibration('6.1')).toBeNull();
     expect(parseCalibration({ ...good, pxPerMm: 50 })).toBeNull();
     expect(parseCalibration({ ...good, method: 'laser' })).toBeNull();
     expect(parseCalibration({ ...good, screen: { dpr: 'x' } })).toBeNull();
+    expect(parseCalibration({ ...good, zoom: 0 })).toBeNull();
+    expect(parseCalibration({ ...good, zoom: 'big' })).toBeNull();
   });
 });
 

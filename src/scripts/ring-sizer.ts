@@ -10,6 +10,7 @@ import {
   isPlausiblePxPerMm,
   parseCalibration,
   sameScreen,
+  zoomMoved,
   type Calibration,
   type CalibrationMethod,
   type ScreenFingerprint,
@@ -52,10 +53,31 @@ function currentScreen(): ScreenFingerprint {
   return { dpr: devicePixelRatio, shortSide, longSide, viewportRatio };
 }
 
-/** A first guess, so the shape starts near the right size: phones ~6 px/mm, desktops ~3.8. */
-function guessPxPerMm(): number {
+/**
+ * How many on-screen px one CSS px takes: 1 normally, 2 when pinched in twice, about 0.37 when a
+ * phone browser shows the "desktop site". On phones in portrait it is measured directly (screen
+ * width over the visible width in CSS px), because some browsers report visualViewport.scale = 1
+ * for a desktop-site page shrunk to fit. Elsewhere the reported scale is used.
+ */
+function pageZoom(): number {
+  const viewport = window.visualViewport;
+  const portrait = innerHeight >= innerWidth;
+  if (matchMedia('(pointer: coarse)').matches && portrait) {
+    const visibleWidth = viewport?.width ?? document.documentElement.clientWidth;
+    const zoom = Math.min(screen.width, screen.height) / visibleWidth;
+    if (Number.isFinite(zoom) && zoom > 0) return Math.round(zoom * 1000) / 1000;
+  }
+  const scale = viewport?.scale;
+  return scale && scale > 0 ? scale : 1;
+}
+
+/**
+ * A first guess in on-screen px, so the shape starts near the right size. Phones are 64-72 mm
+ * wide for 360-430 px (about 5.4-6.3 px/mm); desktops sit near the CSS reference of 96 px per inch.
+ */
+function guessOnScreenPxPerMm(): number {
   if (matchMedia('(pointer: coarse)').matches) {
-    const estimate = Math.min(screen.width, screen.height) / 63;
+    const estimate = Math.min(screen.width, screen.height) / 66;
     return Math.min(8, Math.max(4.5, estimate));
   }
   return 96 / 25.4;
@@ -121,11 +143,22 @@ export function initRingSizer(root: HTMLElement): void {
   const storeAnswer = one<HTMLElement>('[data-store-answer]');
   const copyLabel = one<HTMLElement>('[data-copy-label]');
 
+  // The zoom the page rests at. Slider limits and steps are in CSS px, so they follow it: in
+  // desktop-site mode one on-screen millimetre takes almost three times the CSS px.
+  const baseZoom = pageZoom();
+  calRange.min = String(2.5 / baseZoom);
+  calRange.max = String(12 / baseZoom);
+  const calStep = CAL_STEP / baseZoom;
+  const desktopSite = matchMedia('(pointer: coarse)').matches && baseZoom < 0.9;
+  one<HTMLElement>('[data-desktop-note]').hidden = !desktopSite;
+
   const stored = parseCalibration(loadJson(CAL_KEY));
   let calibration: Calibration | null = stored;
-  let calibrationStale = stored !== null && !sameScreen(stored.screen, currentScreen());
+  let calibrationStale =
+    stored !== null &&
+    (!sameScreen(stored.screen, currentScreen()) || zoomMoved(stored.zoom, baseZoom));
   let calMethod: CalibrationMethod = stored?.method ?? 'card';
-  let pxPerMm = stored?.pxPerMm ?? guessPxPerMm();
+  let pxPerMm = stored && !calibrationStale ? stored.pxPerMm : guessOnScreenPxPerMm() / baseZoom;
   let method: Method = 'ring';
   let ringDiameter = Number(ringRange.value);
   let ringTouched = false;
@@ -188,7 +221,7 @@ export function initRingSizer(root: HTMLElement): void {
 
   calRange.addEventListener('input', () => setPxPerMm(Number(calRange.value)));
   for (const button of all<HTMLButtonElement>('[data-cal-step]')) {
-    holdToRepeat(button, () => setPxPerMm(pxPerMm + Number(button.dataset.calStep) * CAL_STEP));
+    holdToRepeat(button, () => setPxPerMm(pxPerMm + Number(button.dataset.calStep) * calStep));
   }
   for (const input of all<HTMLInputElement>('input[name="cal-method"]')) {
     input.addEventListener('change', () => {
@@ -198,11 +231,19 @@ export function initRingSizer(root: HTMLElement): void {
   }
 
   one<HTMLButtonElement>('[data-cal-done]').addEventListener('click', () => {
-    if (!isPlausiblePxPerMm(pxPerMm)) return;
-    calibration = { pxPerMm, method: calMethod, screen: currentScreen() };
+    const zoom = pageZoom();
+    const calMsg = one<HTMLElement>('[data-cal-msg]');
+    if (!isPlausiblePxPerMm(pxPerMm, zoom)) {
+      calMsg.textContent =
+        'Esse tamanho não parece o de um cartão de verdade. Encoste o cartão na tela e ajuste de novo.';
+      return;
+    }
+    calMsg.textContent = '';
+    calibration = { pxPerMm, method: calMethod, screen: currentScreen(), zoom };
     calibrationStale = false;
     saveJson(CAL_KEY, calibration);
     showPanels();
+    checkZoom();
     panels.ring.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
@@ -424,9 +465,13 @@ export function initRingSizer(root: HTMLElement): void {
     });
   }
 
-  /** Pinch-zoom changes the size of everything on screen, so the shapes stop being true to size. */
+  /**
+   * Pinch-zoom changes the size of everything on screen, so the shapes stop being true to size.
+   * Measured against the calibration's own zoom, or the resting zoom while calibrating.
+   */
   function checkZoom(): void {
-    const zoomed = (window.visualViewport?.scale ?? 1) > 1.02;
+    const reference = calibration && !calibrationStale ? calibration.zoom : baseZoom;
+    const zoomed = zoomMoved(reference, pageZoom());
     for (const note of all<HTMLElement>('[data-zoom-note]')) note.hidden = !zoomed;
   }
   window.visualViewport?.addEventListener('resize', checkZoom);
