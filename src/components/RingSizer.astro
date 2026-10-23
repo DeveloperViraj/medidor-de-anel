@@ -190,7 +190,7 @@ import { Icon } from 'astro-icon/components';
         data-ring-range
         min="12"
         max="25"
-        step="0.05"
+        step="0.1"
         value="17.5"
         aria-label="Diâmetro interno do anel"
       />
@@ -204,7 +204,7 @@ import { Icon } from 'astro-icon/components';
       <span>A página está com zoom. Volte ao tamanho normal para a medida valer.</span>
     </p>
 
-    <details class="check-box">
+    <details class="check-box" data-check-box>
       <summary>Conferir a calibração com uma régua</summary>
       <p class="mt-2 text-sm text-ink-2">
         Esta barra deve medir exatamente <strong data-check-label>3 cm</strong> numa régua. Se não

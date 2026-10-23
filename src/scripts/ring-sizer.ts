@@ -358,6 +358,9 @@ export function initRingSizer(root: HTMLElement): void {
     saveJson(CAL_KEY, calibration);
     showPanels();
     checkZoom();
+    // Right after calibrating, the ruler check is the one way to catch a mismatched card, so it
+    // starts open instead of folded away.
+    one<HTMLDetailsElement>('[data-check-box]').open = true;
     panels.ring.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
@@ -394,7 +397,9 @@ export function initRingSizer(root: HTMLElement): void {
   }
 
   function setRing(diameter: number): void {
-    ringDiameter = Math.min(RING_MAX_MM, Math.max(RING_MIN_MM, Math.round(diameter * 100) / 100));
+    // Tenths of a millimetre: the shown diameter is then the exact value, so diameter × π agrees
+    // with the circumference shown beside it (15,95 would read "16,0 mm" next to "50,1 mm").
+    ringDiameter = Math.min(RING_MAX_MM, Math.max(RING_MIN_MM, Math.round(diameter * 10) / 10));
     ringTouched = true;
     drawRing();
     update();
