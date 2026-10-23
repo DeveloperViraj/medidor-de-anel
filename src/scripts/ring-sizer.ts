@@ -264,6 +264,11 @@ export function initRingSizer(root: HTMLElement): void {
       calCard.style.top = `${CARD_CORNER.top}px`;
       calCard.style.width = `${width}px`;
       calCard.style.height = `${height}px`;
+      // The card drawing is laid out flat and turned by CSS when the outline stands upright.
+      calCard.dataset.orientation = layout.orientation;
+      const flat = layout.orientation === 'landscape';
+      calCard.style.setProperty('--card-w', `${flat ? width : height}px`);
+      calCard.style.setProperty('--card-h', `${flat ? height : width}px`);
       // Real cards have corners of about 3 mm radius; drawn the same so the outline looks right.
       one<HTMLElement>('.cal-card-body').style.borderRadius = `${3 * pxPerMm}px`;
       // The full card height below the corner, plus the right line's stub underneath.

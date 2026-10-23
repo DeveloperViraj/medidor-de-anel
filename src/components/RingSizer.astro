@@ -84,6 +84,30 @@ import { Icon } from 'astro-icon/components';
            right and down until the two coloured lines meet the card's other edges. */}
       <div class="cal-card" data-cal-shape="card" aria-hidden="true">
         <span class="cal-card-body"></span>
+        {/* A faint card, drawn in millimetres, so it is obvious what goes here. It turns with
+             the outline when the card stands upright. */}
+        <span class="cal-card-art">
+          <svg viewBox="0 0 85.6 53.98">
+            <rect class="art-chip" x="8.5" y="17" width="11" height="8.5" rx="1.6"></rect>
+            <path
+              class="art-chip-lines"
+              d="M8.5 21.25h11M14 17v8.5M11.3 17v2.7M16.7 17v2.7M11.3 22.8v2.7M16.7 22.8v2.7"
+            ></path>
+            <path
+              class="art-waves"
+              d="M23.6 18.9a3.4 3.4 0 0 1 0 4.7M25.8 17.5a5.6 5.6 0 0 1 0 7.5M28 16.1a7.8 7.8 0 0 1 0 10.3"
+            ></path>
+            <text class="art-number" x="8.5" y="36">
+              0000 0000 0000 0000
+            </text>
+            <text class="art-holder" x="8.5" y="46.5">
+              NOME DO TITULAR
+            </text>
+            <text class="art-holder" x="62" y="46.5">
+              12/30
+            </text>
+          </svg>
+        </span>
         <span class="cal-anchor cal-anchor-top"></span>
         <span class="cal-anchor cal-anchor-left"></span>
         <span class="cal-edge cal-edge-right"></span>
@@ -527,6 +551,66 @@ import { Icon } from 'astro-icon/components';
     inset: 0;
     background: color-mix(in oklch, var(--color-gold) 16%, transparent);
     border: 1px dashed var(--color-gold-strong);
+  }
+
+  /*
+   * The faint card drawing, always laid out as a card lying flat: the script sets --card-w to the
+   * long side and --card-h to the short side. When the outline stands upright it turns a quarter.
+   */
+  .cal-card-art {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--card-w);
+    height: var(--card-h);
+    transform: translate(-50%, -50%);
+    color: var(--color-ink);
+    pointer-events: none;
+  }
+
+  .cal-card[data-orientation='upright'] .cal-card-art {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+
+  .cal-card-art svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .art-chip {
+    fill: var(--color-gold);
+    opacity: 0.5;
+  }
+
+  .art-chip-lines,
+  .art-waves {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 0.45;
+    stroke-linecap: round;
+    opacity: 0.3;
+  }
+
+  .art-chip-lines {
+    stroke-width: 0.3;
+  }
+
+  .art-number {
+    fill: currentColor;
+    opacity: 0.28;
+    font-family: ui-monospace, 'SFMono-Regular', Menlo, monospace;
+    font-size: 4.2px;
+    letter-spacing: 0.35px;
+  }
+
+  .art-holder {
+    fill: currentColor;
+    opacity: 0.26;
+    font-size: 2.5px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
   }
 
   /* The black L hugging the corner from outside: where the physical card's corner goes. */
