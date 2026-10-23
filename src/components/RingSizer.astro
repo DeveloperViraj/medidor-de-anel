@@ -79,15 +79,17 @@ import { Icon } from 'astro-icon/components';
       </div>
     </fieldset>
 
-    <div class="stage" data-cal-stage>
-      <div class="cal-card" data-cal-shape="card">
-        <span class="cal-edge cal-edge-top" aria-hidden="true">
-          <span>borda de cima do cartão</span>
-        </span>
-        <span class="cal-edge cal-edge-bottom" aria-hidden="true">
-          <span>borda de baixo</span>
-        </span>
-        <span class="cal-card-body" aria-hidden="true"></span>
+    <div class="stage stage-bleed" data-cal-stage>
+      {/* Corner-anchored: the card's top-left corner sits in the black L, and the drawing grows
+           right and down until the two coloured lines meet the card's other edges. */}
+      <div class="cal-card" data-cal-shape="card" aria-hidden="true">
+        <span class="cal-card-body"></span>
+        <span class="cal-anchor cal-anchor-top"></span>
+        <span class="cal-anchor cal-anchor-left"></span>
+        <span class="cal-edge cal-edge-right"></span>
+        <span class="cal-edge cal-edge-bottom"></span>
+        <span class="cal-label cal-label-corner">canto do cartão aqui</span>
+        <span class="cal-label cal-label-edges">linhas nas bordas do cartão</span>
       </div>
       <div class="cal-coin" data-cal-shape="coin" hidden aria-hidden="true"></div>
       <div class="cal-ruler-wrap" data-cal-shape="ruler" hidden aria-hidden="true">
@@ -113,17 +115,26 @@ import { Icon } from 'astro-icon/components';
         <Icon name="lucide:plus" class="size-5" aria-hidden="true" />
       </button>
     </div>
-    <p class="step-text" data-cal-hint="card">
-      Encoste um cartão de banco <strong>deitado</strong> na tela, com a borda de cima na linha de
-      cima. Ajuste até a linha de baixo coincidir com a borda de baixo. Pode passar das laterais.
+    <p class="step-text" data-cal-hint="card-upright">
+      Deixe o celular <strong>deitado na mesa</strong> e coloque um cartão de banco
+      <strong>em pé</strong> em cima do desenho, com o canto de cima encaixado no canto preto.
+      Depois ajuste até as duas linhas coloridas encostarem na borda direita e na de baixo do
+      cartão. Olhe bem de cima, não de lado.
+    </p>
+    <p class="step-text" data-cal-hint="card-landscape" hidden>
+      Encoste um cartão de banco <strong>deitado</strong> na tela, com o canto de cima encaixado no
+      canto preto. Depois ajuste até as duas linhas coloridas encostarem na borda direita e na de
+      baixo do cartão.
     </p>
     <p class="step-text" data-cal-hint="coin" hidden>
-      Coloque uma moeda de <strong>R$ 1</strong> em cima do círculo e ajuste até ficar do mesmo
-      tamanho, sem sobrar borda.
+      Deixe o celular deitado na mesa e coloque uma moeda de <strong>R$ 1</strong> em cima do
+      círculo. Ajuste até o círculo ficar do tamanho exato da moeda, sem sobrar borda. A moeda é
+      prática, mas por ser pequena erra mais: se tiver um cartão, prefira o cartão.
     </p>
     <p class="step-text" data-cal-hint="ruler" hidden>
       Encoste uma régua com o zero na primeira marca e ajuste até os centímetros coincidirem.
     </p>
+    <p class="drag-tip">Dica: arraste o dedo para os lados em cima do desenho, ou use − e +.</p>
     <p class="zoom-note" data-zoom-note hidden>
       <Icon name="lucide:zoom-in" class="size-4 shrink-0" aria-hidden="true" />
       <span>A página está com zoom. Faça o movimento de pinça para voltar ao tamanho normal.</span>
@@ -486,58 +497,102 @@ import { Icon } from 'astro-icon/components';
     min-height: 13.5rem;
   }
 
+  /*
+   * Phones: the calibration stage runs edge to edge. Inside the card's padding an iPhone has about
+   * 53 mm across, less than the 54 mm of a card standing upright; the full screen has 62-75 mm.
+   */
+  @media (max-width: 639px) {
+    .stage-bleed {
+      width: 100vw;
+      margin-left: calc(50% - 50vw);
+      border-radius: 0;
+      border-inline: 0;
+    }
+  }
+
+  /* Placed by the script (left/top/size); the corner stays put while the size changes. */
   .cal-card {
-    position: relative;
-    flex: none;
+    position: absolute;
   }
 
   .cal-card-body {
     position: absolute;
     inset: 0;
-    border-radius: 3px;
-    background: color-mix(in oklch, var(--color-gold) 18%, transparent);
+    background: color-mix(in oklch, var(--color-gold) 16%, transparent);
     border: 1px dashed var(--color-gold-strong);
   }
 
-  /* The two edges that matter: full-width lines, so they stay visible when the card overflows. */
+  /* The black L hugging the corner from outside: where the physical card's corner goes. */
+  .cal-anchor {
+    position: absolute;
+    background: var(--color-ink);
+  }
+
+  .cal-anchor-top {
+    top: -4px;
+    left: -4px;
+    width: 45%;
+    height: 4px;
+  }
+
+  .cal-anchor-left {
+    top: -4px;
+    left: -4px;
+    width: 4px;
+    height: 30%;
+  }
+
+  /*
+   * The two edges being matched. They run past the card at both ends, so a stub stays visible
+   * beside the physical card once it covers the drawing.
+   */
   .cal-edge {
     position: absolute;
-    left: -100vw;
-    right: -100vw;
-    height: 0;
-    border-top: 2px solid var(--color-accent);
     z-index: 1;
   }
 
-  .cal-edge-top {
-    top: -1px;
+  .cal-edge-right {
+    top: -14px;
+    bottom: -30px;
+    right: -1px;
+    border-left: 2px solid var(--color-accent);
   }
 
   .cal-edge-bottom {
+    left: -14px;
+    right: -30px;
     bottom: -1px;
+    border-top: 2px solid var(--color-accent);
   }
 
-  /* Small labels on each line, centred: the card is centred in the stage, so this is always visible. */
-  .cal-edge > span {
+  .cal-label {
     position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
     padding: 0 0.375rem;
     border-radius: var(--radius-xs);
-    background: var(--color-accent);
-    color: var(--color-on-accent);
     font-size: 0.6875rem;
     font-weight: var(--font-weight-semibold);
     line-height: 1.125rem;
     white-space: nowrap;
   }
 
-  .cal-edge-top > span {
-    top: 0.25rem;
+  .cal-label-corner {
+    top: 0.5rem;
+    left: 0.5rem;
+    background: var(--color-ink);
+    color: var(--color-canvas);
   }
 
-  .cal-edge-bottom > span {
-    bottom: 0.25rem;
+  .cal-label-edges {
+    right: 0.5rem;
+    bottom: 0.5rem;
+    background: var(--color-accent);
+    color: var(--color-on-accent);
+  }
+
+  .drag-tip {
+    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-ink-3);
   }
 
   .seg-icon {

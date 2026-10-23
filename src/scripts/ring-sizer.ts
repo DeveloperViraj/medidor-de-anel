@@ -72,15 +72,71 @@ function pageZoom(): number {
 }
 
 /**
- * A first guess in on-screen px, so the shape starts near the right size. Phones are 64-72 mm
- * wide for 360-430 px (about 5.4-6.3 px/mm); desktops sit near the CSS reference of 96 px per inch.
+ * iPhones can be recognised from their screen size and pixel ratio, and Apple's published pixel
+ * densities give the real scale. Every 3x model except the minis is 0.166 mm per CSS px (458-460
+ * ppi), every 2x model 0.156 (326 ppi); 320 px at 3x is Display Zoom on a 12/13 (0.202). The
+ * 375x812 3x screen is shared by the X/XS/11 Pro, the 12/13 mini and a zoomed Pro Max, so this is
+ * only where the card outline starts: the person always checks it against a real card.
+ * Sources: Apple tech specs as compiled at ios-resolution.com (October 2026).
+ */
+function iphonePxPerMm(): number | null {
+  if (!/iPhone/.test(navigator.userAgent)) return null;
+  const dpr = Math.round(devicePixelRatio);
+  if (dpr === 3) return Math.min(screen.width, screen.height) === 320 ? 1 / 0.202 : 1 / 0.1664;
+  if (dpr === 2) return 1 / 0.1558;
+  return null;
+}
+
+/**
+ * A first guess in on-screen px, so the shape starts near the right size. Android hides the phone
+ * model from JavaScript, so it gets the width rule: phones are 64-72 mm wide for 360-430 px (about
+ * 5.4-6.3 px/mm). Desktops sit near the CSS reference of 96 px per inch.
  */
 function guessOnScreenPxPerMm(): number {
+  const iphone = iphonePxPerMm();
+  if (iphone) return iphone;
   if (matchMedia('(pointer: coarse)').matches) {
     const estimate = Math.min(screen.width, screen.height) / 66;
     return Math.min(8, Math.max(4.5, estimate));
   }
   return 96 / 25.4;
+}
+
+/**
+ * Phones in portrait take the card standing upright: its 54 mm short side fits across any
+ * current phone screen, so the whole outline shows. Elsewhere it lies flat, as on a monitor.
+ */
+const cardOrientation = (): 'upright' | 'landscape' =>
+  matchMedia('(pointer: coarse)').matches && innerHeight >= innerWidth ? 'upright' : 'landscape';
+
+/** Where the card's top-left corner sits in the stage, in CSS px. Fixed while the size changes. */
+const CARD_CORNER = { left: 14, top: 18 };
+
+/**
+ * Horizontal drags on a stage resize its shape, so the edge follows the finger. Vertical drags
+ * still scroll the page (the stage is touch-action: pan-y), which then cancels the drag.
+ */
+function dragToResize(stage: HTMLElement, onDrag: (dx: number, start: boolean) => void): void {
+  let startX: number | null = null;
+  stage.addEventListener('pointerdown', (event) => {
+    if (event.button !== 0) return;
+    startX = event.clientX;
+    onDrag(0, true);
+    try {
+      // Keeps the drag going when the finger slides off the stage; optional, so failures are fine.
+      stage.setPointerCapture(event.pointerId);
+    } catch {
+      /* no active pointer (synthetic events, some embedded browsers) */
+    }
+  });
+  stage.addEventListener('pointermove', (event) => {
+    if (startX !== null) onDrag(event.clientX - startX, false);
+  });
+  const end = () => {
+    startX = null;
+  };
+  stage.addEventListener('pointerup', end);
+  stage.addEventListener('pointercancel', end);
 }
 
 /** Repeats while a −/+ button is held; one step per tap or key press. */
@@ -176,13 +232,19 @@ export function initRingSizer(root: HTMLElement): void {
     calCard.hidden = calMethod !== 'card';
     calCoin.hidden = calMethod !== 'coin';
     calRulerWrap.hidden = calMethod !== 'ruler';
+    const hintKey = calMethod === 'card' ? `card-${cardOrientation()}` : calMethod;
     for (const hint of all<HTMLElement>('[data-cal-hint]')) {
-      hint.hidden = hint.dataset.calHint !== calMethod;
+      hint.hidden = hint.dataset.calHint !== hintKey;
     }
 
     if (calMethod === 'card') {
-      calCard.style.width = `${CARD_LONG_MM * pxPerMm}px`;
-      calCard.style.height = `${CARD_SHORT_MM * pxPerMm}px`;
+      const { width, height } = cardSizePx();
+      calCard.style.left = `${CARD_CORNER.left}px`;
+      calCard.style.top = `${CARD_CORNER.top}px`;
+      calCard.style.width = `${width}px`;
+      calCard.style.height = `${height}px`;
+      // Real cards have corners of about 3 mm radius; drawn the same so the outline looks right.
+      one<HTMLElement>('.cal-card-body').style.borderRadius = `${3 * pxPerMm}px`;
     } else if (calMethod === 'coin') {
       const size = `${COIN_R1_MM * pxPerMm}px`;
       calCoin.style.width = size;
@@ -190,9 +252,17 @@ export function initRingSizer(root: HTMLElement): void {
     } else {
       drawRuler();
     }
-    // The card needs its full height plus room for the guide lines.
+    // The card needs its full height below the corner plus room for the line stubs.
     calStage.style.minHeight =
-      calMethod === 'card' ? `${Math.max(240, CARD_SHORT_MM * pxPerMm + 48)}px` : '';
+      calMethod === 'card' ? `${Math.max(240, CARD_CORNER.top + cardSizePx().height + 44)}px` : '';
+  }
+
+  /** The card outline in CSS px at the current calibration value, in the orientation in use. */
+  function cardSizePx(): { width: number; height: number; widthMm: number } {
+    const upright = cardOrientation() === 'upright';
+    const widthMm = upright ? CARD_SHORT_MM : CARD_LONG_MM;
+    const heightMm = upright ? CARD_LONG_MM : CARD_SHORT_MM;
+    return { width: widthMm * pxPerMm, height: heightMm * pxPerMm, widthMm };
   }
 
   function drawRuler(): void {
@@ -220,6 +290,23 @@ export function initRingSizer(root: HTMLElement): void {
   }
 
   calRange.addEventListener('input', () => setPxPerMm(Number(calRange.value)));
+
+  // Dragging moves the card's right edge with the finger. Round shapes grow by the finger's
+  // movement in diameter, so the rim moves at half speed: finer control where a pixel counts.
+  // The ruler has no single edge to drag.
+  let dragStartPx = pxPerMm;
+  dragToResize(calStage, (dx, start) => {
+    if (start) {
+      dragStartPx = pxPerMm;
+      return;
+    }
+    if (calMethod === 'card') {
+      const { widthMm } = cardSizePx();
+      setPxPerMm((widthMm * dragStartPx + dx) / widthMm);
+    } else if (calMethod === 'coin') {
+      setPxPerMm((COIN_R1_MM * dragStartPx + dx) / COIN_R1_MM);
+    }
+  });
   for (const button of all<HTMLButtonElement>('[data-cal-step]')) {
     holdToRepeat(button, () => setPxPerMm(pxPerMm + Number(button.dataset.calStep) * calStep));
   }
@@ -284,6 +371,18 @@ export function initRingSizer(root: HTMLElement): void {
   }
 
   ringRange.addEventListener('input', () => setRing(Number(ringRange.value)));
+
+  // A ring is matched to a tenth of a millimetre, so the drag is gentle: the diameter grows by the
+  // finger's movement and the rim follows at half speed.
+  let dragStartDiameter = ringDiameter;
+  dragToResize(one<HTMLElement>('[data-ring-stage]'), (dx, start) => {
+    if (!calibration) return;
+    if (start) {
+      dragStartDiameter = ringDiameter;
+      return;
+    }
+    setRing(dragStartDiameter + dx / calibration.pxPerMm);
+  });
   for (const button of all<HTMLButtonElement>('[data-ring-step]')) {
     holdToRepeat(button, () =>
       setRing(ringDiameter + Number(button.dataset.ringStep) * RING_STEP_MM),
