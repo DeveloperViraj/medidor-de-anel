@@ -7,12 +7,15 @@ import {
   CARD_LONG_MM,
   CARD_SHORT_MM,
   COIN_R1_MM,
+  cardLayout,
   isPlausiblePxPerMm,
+  onScreenRange,
   parseCalibration,
   sameScreen,
   zoomMoved,
   type Calibration,
   type CalibrationMethod,
+  type CardLayout,
   type ScreenFingerprint,
 } from '../lib/calibration';
 import { formatCm, formatMm, parseDecimal } from '../lib/format';
@@ -103,14 +106,12 @@ function guessOnScreenPxPerMm(): number {
 }
 
 /**
- * Phones in portrait take the card standing upright: its 54 mm short side fits across any
- * current phone screen, so the whole outline shows. Elsewhere it lies flat, as on a monitor.
+ * Where the card's top-left corner sits in the stage, in CSS px. Fixed while the size changes.
+ * Kept tight: an iPhone 12/13 mini is 57.6 mm across, only 3.6 mm more than an upright card.
  */
-const cardOrientation = (): 'upright' | 'landscape' =>
-  matchMedia('(pointer: coarse)').matches && innerHeight >= innerWidth ? 'upright' : 'landscape';
-
-/** Where the card's top-left corner sits in the stage, in CSS px. Fixed while the size changes. */
-const CARD_CORNER = { left: 14, top: 18 };
+const CARD_CORNER = { left: 6, top: 16 };
+/** Stage width the card cannot use: the corner offset, the bottom line's 6 px stub and border. */
+const CARD_FIT_EXTRA = CARD_CORNER.left + 8;
 
 /**
  * Horizontal drags on a stage resize its shape, so the edge follows the finger. Vertical drags
@@ -202,10 +203,12 @@ export function initRingSizer(root: HTMLElement): void {
   // The zoom the page rests at. Slider limits and steps are in CSS px, so they follow it: in
   // desktop-site mode one on-screen millimetre takes almost three times the CSS px.
   const baseZoom = pageZoom();
-  calRange.min = String(2.5 / baseZoom);
-  calRange.max = String(12 / baseZoom);
+  const touch = matchMedia('(pointer: coarse)').matches;
+  const range = onScreenRange(touch);
+  const minPx = range.min / baseZoom;
+  const maxPx = range.max / baseZoom;
   const calStep = CAL_STEP / baseZoom;
-  const desktopSite = matchMedia('(pointer: coarse)').matches && baseZoom < 0.9;
+  const desktopSite = touch && baseZoom < 0.9;
   one<HTMLElement>('[data-desktop-note]').hidden = !desktopSite;
 
   const stored = parseCalibration(loadJson(CAL_KEY));
@@ -226,40 +229,63 @@ export function initRingSizer(root: HTMLElement): void {
 
   // ---- Calibration ------------------------------------------------------------------------
 
+  /** Card orientation and slider limit for the stage as it is now laid out. */
+  const currentLayout = (): CardLayout => cardLayout(calStage.clientWidth - CARD_FIT_EXTRA, maxPx);
+
   function drawCalibration(): void {
+    const layout = currentLayout();
+    // The card's limit depends on the stage; the coin and the ruler fit at any plausible value.
+    const sliderMax = calMethod === 'card' ? layout.maxPxPerMm : maxPx;
+    pxPerMm = Math.min(sliderMax, Math.max(minPx, pxPerMm));
+    calRange.min = String(minPx);
+    calRange.max = String(sliderMax);
     calRange.value = String(pxPerMm);
     calRange.setAttribute('aria-valuetext', `${formatMm(pxPerMm * 10)} pixels por centímetro`);
     calCard.hidden = calMethod !== 'card';
     calCoin.hidden = calMethod !== 'coin';
     calRulerWrap.hidden = calMethod !== 'ruler';
-    const hintKey = calMethod === 'card' ? `card-${cardOrientation()}` : calMethod;
+    const hintKey = calMethod === 'card' ? `card-${layout.orientation}` : calMethod;
     for (const hint of all<HTMLElement>('[data-cal-hint]')) {
       hint.hidden = hint.dataset.calHint !== hintKey;
     }
+    // On a small screen the slider stops where the card would leave it; if the real card is
+    // still bigger, the coin or the ruler will fit.
+    one<HTMLElement>('[data-cal-limit]').hidden = !(
+      calMethod === 'card' &&
+      layout.limitedByScreen &&
+      // Within half a percent: the slider snaps to its step, just short of the exact limit.
+      pxPerMm >= sliderMax * 0.995
+    );
 
+    let stageHeight = 240;
     if (calMethod === 'card') {
-      const { width, height } = cardSizePx();
+      const { width, height } = cardSizePx(layout.orientation);
       calCard.style.left = `${CARD_CORNER.left}px`;
       calCard.style.top = `${CARD_CORNER.top}px`;
       calCard.style.width = `${width}px`;
       calCard.style.height = `${height}px`;
       // Real cards have corners of about 3 mm radius; drawn the same so the outline looks right.
       one<HTMLElement>('.cal-card-body').style.borderRadius = `${3 * pxPerMm}px`;
+      // The full card height below the corner, plus the right line's stub underneath.
+      stageHeight = Math.max(stageHeight, CARD_CORNER.top + height + 40);
     } else if (calMethod === 'coin') {
-      const size = `${COIN_R1_MM * pxPerMm}px`;
-      calCoin.style.width = size;
-      calCoin.style.height = size;
+      const size = COIN_R1_MM * pxPerMm;
+      calCoin.style.width = `${size}px`;
+      calCoin.style.height = `${size}px`;
+      stageHeight = Math.max(stageHeight, size + 32);
     } else {
       drawRuler();
     }
-    // The card needs its full height below the corner plus room for the line stubs.
-    calStage.style.minHeight =
-      calMethod === 'card' ? `${Math.max(240, CARD_CORNER.top + cardSizePx().height + 44)}px` : '';
+    calStage.style.minHeight = `${stageHeight}px`;
   }
 
-  /** The card outline in CSS px at the current calibration value, in the orientation in use. */
-  function cardSizePx(): { width: number; height: number; widthMm: number } {
-    const upright = cardOrientation() === 'upright';
+  /** The card outline in CSS px at the current calibration value. */
+  function cardSizePx(orientation: CardLayout['orientation']): {
+    width: number;
+    height: number;
+    widthMm: number;
+  } {
+    const upright = orientation === 'upright';
     const widthMm = upright ? CARD_SHORT_MM : CARD_LONG_MM;
     const heightMm = upright ? CARD_LONG_MM : CARD_SHORT_MM;
     return { width: widthMm * pxPerMm, height: heightMm * pxPerMm, widthMm };
@@ -284,8 +310,9 @@ export function initRingSizer(root: HTMLElement): void {
     calRuler.innerHTML = ticks;
   }
 
+  /** drawCalibration clamps the value to what the current layout allows. */
   function setPxPerMm(value: number): void {
-    pxPerMm = Math.min(Number(calRange.max), Math.max(Number(calRange.min), value));
+    pxPerMm = value;
     drawCalibration();
   }
 
@@ -301,7 +328,7 @@ export function initRingSizer(root: HTMLElement): void {
       return;
     }
     if (calMethod === 'card') {
-      const { widthMm } = cardSizePx();
+      const { widthMm } = cardSizePx(currentLayout().orientation);
       setPxPerMm((widthMm * dragStartPx + dx) / widthMm);
     } else if (calMethod === 'coin') {
       setPxPerMm((COIN_R1_MM * dragStartPx + dx) / COIN_R1_MM);
@@ -346,6 +373,9 @@ export function initRingSizer(root: HTMLElement): void {
     const size = `${ringDiameter * calibration.pxPerMm}px`;
     ringCircle.style.width = size;
     ringCircle.style.height = size;
+    // Tall enough for the largest ring the slider allows, so the circle is never clipped.
+    one<HTMLElement>('[data-ring-stage]').style.minHeight =
+      `${Math.max(216, RING_MAX_MM * calibration.pxPerMm + 24)}px`;
     ringRange.value = String(ringDiameter);
     const size16 = sizeFromCircumference(circumferenceFromDiameter(ringDiameter));
     const text = `${formatMm(ringDiameter)} mm · aro ${size16.aro.aro}`;
@@ -580,8 +610,9 @@ export function initRingSizer(root: HTMLElement): void {
     if (calibration && !calibrationStale && !sameScreen(calibration.screen, currentScreen())) {
       calibrationStale = true;
       showPanels();
-    } else if (!panels.calibrate.hidden && calMethod === 'ruler') {
-      drawRuler();
+    } else if (!panels.calibrate.hidden) {
+      // A wider or narrower window can change the card's orientation and the slider's limit.
+      drawCalibration();
     }
   }
   window.addEventListener('resize', checkScreen);

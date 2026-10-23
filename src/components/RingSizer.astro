@@ -135,6 +135,13 @@ import { Icon } from 'astro-icon/components';
       Encoste uma régua com o zero na primeira marca e ajuste até os centímetros coincidirem.
     </p>
     <p class="drag-tip">Dica: arraste o dedo para os lados em cima do desenho, ou use − e +.</p>
+    <p class="stale-note" data-cal-limit hidden>
+      <Icon name="lucide:info" class="size-4 shrink-0" aria-hidden="true" />
+      <span>
+        O desenho chegou ao tamanho máximo que cabe nesta tela. Se o cartão ainda for maior, use a
+        moeda de R$ 1 ou a régua.
+      </span>
+    </p>
     <p class="zoom-note" data-zoom-note hidden>
       <Icon name="lucide:zoom-in" class="size-4 shrink-0" aria-hidden="true" />
       <span>A página está com zoom. Faça o movimento de pinça para voltar ao tamanho normal.</span>
@@ -558,9 +565,10 @@ import { Icon } from 'astro-icon/components';
     border-left: 2px solid var(--color-accent);
   }
 
+  /* The stub past the right edge stays short: its width is reserved in CARD_FIT_EXTRA. */
   .cal-edge-bottom {
-    left: -14px;
-    right: -30px;
+    left: -6px;
+    right: -6px;
     bottom: -1px;
     border-top: 2px solid var(--color-accent);
   }

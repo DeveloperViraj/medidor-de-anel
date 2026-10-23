@@ -3,7 +3,9 @@ import {
   CARD_LONG_MM,
   CARD_SHORT_MM,
   COIN_R1_MM,
+  cardLayout,
   isPlausiblePxPerMm,
+  onScreenRange,
   parseCalibration,
   pxPerMmFrom,
   sameScreen,
@@ -49,6 +51,57 @@ describe('calibration objects', () => {
     expect(cssPxPerMm).toBeGreaterThan(14);
     expect(isPlausiblePxPerMm(cssPxPerMm)).toBe(false);
     expect(isPlausiblePxPerMm(cssPxPerMm, zoom)).toBe(true);
+  });
+});
+
+describe('cardLayout', () => {
+  const phone = onScreenRange(true).max;
+  const computer = onScreenRange(false).max;
+
+  it('lays the card flat on a computer, where it fits at every slider value', () => {
+    // The tool column on a computer leaves a 686 px stage; 14 px go to the corner and the stub.
+    const layout = cardLayout(686 - 14, computer);
+    expect(layout).toEqual({ orientation: 'landscape', maxPxPerMm: 7, limitedByScreen: false });
+    expect(CARD_LONG_MM * layout.maxPxPerMm).toBeLessThanOrEqual(686 - 14);
+  });
+
+  it('reaches the densest common computer screen: a 14" Full HD laptop at 100%', () => {
+    expect(computer).toBeGreaterThanOrEqual(157 / 25.4);
+    expect(computer).toBeGreaterThanOrEqual(166 / 25.4); // 13.3" Full HD
+  });
+
+  it('stands the card up on a phone and caps the slider at the screen', () => {
+    // A 360 px phone: the stage runs edge to edge; 14 px go to the corner offset and the line stub.
+    const layout = cardLayout(360 - 14, phone);
+    expect(layout.orientation).toBe('upright');
+    expect(layout.limitedByScreen).toBe(true);
+    expect(CARD_SHORT_MM * layout.maxPxPerMm).toBeCloseTo(346, 6);
+  });
+
+  // Real scales from the published pixel densities: each phone's true value must be reachable.
+  it.each([
+    ['720p Android, 360 px', 360, 5.31],
+    ['Galaxy S21, 360 px', 360, 5.58],
+    ['iPhone 12-16, 390 px', 390, 6.02],
+    ['iPhone SE 2/3, 375 px', 375, 6.42],
+    ['iPhone 12/13 mini, 375 px', 375, 6.51],
+    ['Pixel 8, 412 px', 412, 6.1],
+  ])('%s can reach its real scale', (_name, width, real) => {
+    expect(cardLayout(width - 14, phone).maxPxPerMm).toBeGreaterThanOrEqual(real);
+  });
+
+  it('lays the card flat on a phone held sideways', () => {
+    expect(cardLayout(844 - 14, phone).orientation).toBe('landscape');
+  });
+
+  it('never lets the outline outgrow the room it is given', () => {
+    for (let room = 200; room <= 1900; room += 50) {
+      for (const max of [phone, computer, phone / 0.367]) {
+        const { orientation, maxPxPerMm } = cardLayout(room, max);
+        const widthMm = orientation === 'upright' ? CARD_SHORT_MM : CARD_LONG_MM;
+        expect(widthMm * maxPxPerMm).toBeLessThanOrEqual(room + 1e-9);
+      }
+    }
   });
 });
 

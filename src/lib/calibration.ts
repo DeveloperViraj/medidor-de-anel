@@ -35,6 +35,43 @@ export function isPlausiblePxPerMm(pxPerMm: number, zoom = 1): boolean {
   return Number.isFinite(onScreen) && onScreen >= MIN_PX_PER_MM && onScreen <= MAX_PX_PER_MM;
 }
 
+/**
+ * The slider's range, in on-screen px per mm. Phones and tablets run 4.5-6.6 in practice (a 2x
+ * iPhone is 6.4, a low-cost 720p Android about 5.3). Computers run 3.5-6.5: big monitors 3.5-4.8,
+ * MacBooks about 5.1, and the densest common case is a 13-14" Full HD laptop at 100% scaling
+ * (157-166 ppi, 6.2-6.5). The margins cover unusual screens; on a computer the cap of 7 also keeps
+ * a flat card (599 px) inside the 686 px tool column.
+ */
+export function onScreenRange(touch: boolean): { min: number; max: number } {
+  return touch ? { min: 4, max: 8 } : { min: 2.5, max: 7 };
+}
+
+export interface CardLayout {
+  orientation: 'upright' | 'landscape';
+  /** Largest CSS px per mm the slider may reach, so the outline never leaves the stage. */
+  maxPxPerMm: number;
+  /** True when the stage, not the device range, sets the limit (small screens). */
+  limitedByScreen: boolean;
+}
+
+/**
+ * How to draw the calibration card in a stage with `roomPx` CSS px across. The card lies flat
+ * only if its 85.6 mm long side fits at every value the slider can reach (computers, phones held
+ * sideways). Otherwise it stands upright, 53.98 mm across, and the slider stops where the outline
+ * would leave the stage, so it can never spill out.
+ */
+export function cardLayout(roomPx: number, maxPxPerMm: number): CardLayout {
+  if (roomPx / CARD_LONG_MM >= maxPxPerMm) {
+    return { orientation: 'landscape', maxPxPerMm, limitedByScreen: false };
+  }
+  const fit = roomPx / CARD_SHORT_MM;
+  return {
+    orientation: 'upright',
+    maxPxPerMm: Math.min(maxPxPerMm, fit),
+    limitedByScreen: fit < maxPxPerMm,
+  };
+}
+
 /** Zoom values a browser can really have; anything else in storage is corrupt. */
 const isPlausibleZoom = (zoom: number): boolean =>
   Number.isFinite(zoom) && zoom >= 0.1 && zoom <= 10;
