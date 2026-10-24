@@ -1,0 +1,117 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import CouplePanel from '../components/CouplePanel.astro';
+import FaqList from '../components/FaqList.astro';
+import RingSizer from '../components/RingSizer.astro';
+import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
+
+const title = 'Medidor de Aliança Online – Meça o Aro dos Dois na Tela';
+const description =
+  'Meça o aro das duas alianças na tela do celular e junte as medidas num link só, mesmo à distância. Grátis, sem cadastro, com dicas de largura e de mão.';
+
+const faqs: Faq[] = [
+  {
+    q: 'As duas alianças têm o mesmo aro?',
+    a: 'Quase nunca. Cada aliança é do tamanho do dedo de quem vai usar, então cada pessoa precisa da sua medida. O medidor guarda uma medida para cada um.',
+  },
+  {
+    q: 'Em que mão vai a aliança?',
+    a: 'No Brasil é costume usar a aliança de noivado no anelar da mão direita e passar para o anelar da mão esquerda no casamento. Meça o dedo em que a aliança vai ficar, porque cada dedo e cada mão têm um tamanho.',
+  },
+  {
+    q: 'Dá para medir a aliança do meu par à distância?',
+    a: 'Dá. Depois de guardar a sua medida, mande o link pelo WhatsApp. Ele abre o medidor no celular do seu par com a sua medida já guardada, e as duas ficam juntas quando a outra pessoa medir.',
+  },
+  {
+    q: 'O link mostra o nosso nome?',
+    a: 'Não. O link leva só as duas medidas em milímetros. Nenhum nome ou dado pessoal vai junto, e nada é enviado para nós.',
+  },
+];
+
+const schema = [
+  webApplication({
+    url: absolute('/medidor-de-alianca'),
+    name: 'Medidor de aliança online',
+    description,
+  }),
+  faqPage(absolute('/medidor-de-alianca'), faqs),
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Medidor de aliança online"
+  description={description}
+  updated="2026-10-24"
+  schema={schema}
+  wide
+>
+  <div slot="tool">
+    <RingSizer />
+    <CouplePanel />
+  </div>
+
+  <h2>Como medir para a aliança</h2>
+  <ul>
+    <li>
+      <strong>Meçam os dois no fim do dia</strong>, com as mãos em temperatura normal. De manhã e no
+      frio o dedo fica menor, e logo depois de exercício fica inchado.
+    </li>
+    <li>
+      <strong>Meça o dedo certo.</strong> No Brasil a aliança de noivado costuma ir no anelar da mão
+      direita e passa para a esquerda no casamento. A mão que você mais usa costuma ser um pouco
+      maior.
+    </li>
+    <li>
+      <strong>Se já existe um anel que serve nesse dedo, meça o anel</strong>: é mais preciso que
+      medir o dedo.
+    </li>
+    <li>
+      <strong>Sem anel, use uma tira de papel</strong>, não barbante. Barbante estica e dá uma
+      medida menor que o dedo.
+    </li>
+  </ul>
+
+  <h2>A largura da aliança muda o aro?</h2>
+  <p>
+    Muda a sensação. Alianças de 2 e 3 mm são discretas, as de 4 e 5 mm são intermediárias e as de 6
+    a 8 mm são largas. Uma aliança larga cobre mais pele e veste mais justa que uma fina no mesmo
+    aro. A partir de uns 6 mm, o ideal é provar um aro de prova da mesma largura na loja; se não
+    der, considere um número acima.
+  </p>
+
+  <h2>Anatômica ou reta?</h2>
+  <p>
+    A aliança anatômica tem a parte de dentro arredondada e desliza melhor pela junta do que uma
+    reta da mesma largura. A reta tem o interior plano. O aro é o mesmo nas duas, mas a anatômica
+    costuma parecer um pouco mais confortável.
+  </p>
+
+  <h2>Ficou entre dois aros?</h2>
+  <p>
+    Escolha o maior: é mais fácil apertar uma aliança do que alargar. Antes de comprar, pergunte se
+    a loja faz o ajuste de tamanho e se a primeira troca é sem custo; muitas fazem. Atenção às
+    alianças de aço inox: normalmente não podem ser ajustadas depois.
+  </p>
+
+  <h2>E se a loja disser outro número?</h2>
+  <p>
+    No Brasil existem duas tabelas de aro, e o mesmo dedo pode dar números diferentes em lojas
+    diferentes. Por isso cada medida mostra também os milímetros e o aro na tabela por diâmetro.
+    Entenda em{' '}
+    <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a> e use o
+    teste &quot;Descobrir qual tabela a loja usa&quot; no resultado do medidor.
+  </p>
+
+  <h2>É surpresa?</h2>
+  <p>
+    Então o link para o seu par não serve. Veja{' '}
+    <a href="/como-descobrir-tamanho-de-anel-em-segredo">
+      como descobrir o tamanho do anel em segredo
+    </a>
+    .
+  </p>
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>

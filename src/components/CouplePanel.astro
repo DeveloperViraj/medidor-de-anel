@@ -1,0 +1,213 @@
+---
+/**
+ * Modo aliança: keeps one size per person under the sizer. Sizes come from the sizer's result, a
+ * shared link (?a=56.0&b=62.0, circumferences in mm) or this device's storage. The links carry only
+ * the two sizes, never names. Behaviour lives in src/scripts/couple.ts.
+ */
+import { Icon } from 'astro-icon/components';
+
+const slots = [
+  { key: 'a', label: 'Pessoa 1' },
+  { key: 'b', label: 'Pessoa 2' },
+] as const;
+---
+
+<section class="couple" data-couple aria-labelledby="couple-title">
+  <h2 id="couple-title" class="couple-title">
+    As duas alianças
+  </h2>
+  <p class="couple-text" data-couple-hint>
+    Meça uma pessoa de cada vez. Quando o aro aparecer no medidor, guarde a medida na pessoa certa.
+  </p>
+  <p class="couple-note" data-from-link hidden></p>
+
+  <div class="slots">
+    {slots.map((slot) => (
+      <div class="slot" data-slot={slot.key}>
+        <p class="slot-label">{slot.label}</p>
+        <p class="slot-aro num" data-slot-aro>
+          —
+        </p>
+        <p class="slot-mm num" data-slot-mm>
+          Ainda sem medida
+        </p>
+        <p class="slot-b" data-slot-b hidden></p>
+        <div class="slot-actions">
+          <button type="button" class="btn btn-solid btn-sm" data-save={slot.key} disabled>
+            <Icon name="lucide:check" class="size-4" aria-hidden="true" />
+            <span data-save-label>Guardar a medida atual</span>
+          </button>
+          <button type="button" class="link-btn text-sm" data-clear={slot.key} hidden>
+            Apagar
+          </button>
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="share" data-invite hidden>
+    <p class="font-semibold text-ink">O seu par está longe?</p>
+    <p class="mt-1 text-sm text-ink-2">
+      Mande este link: ele abre o medidor no celular do seu par com a sua medida já guardada. Quando
+      a outra pessoa medir, as duas medidas ficam juntas.
+    </p>
+    <div class="share-actions">
+      <a class="btn btn-solid btn-sm" data-invite-whatsapp target="_blank" rel="noopener">
+        <Icon name="lucide:message-circle" class="size-4" aria-hidden="true" />
+        Mandar no WhatsApp
+      </a>
+      <button type="button" class="btn btn-ghost btn-sm" data-invite-copy>
+        <Icon name="lucide:link" class="size-4" aria-hidden="true" />
+        <span data-copy-text>Copiar o link</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="share" data-both hidden>
+    <p class="font-semibold text-ink" data-both-summary></p>
+    <p class="mt-1 text-sm text-ink-2">
+      Guarde o link ou mande para a loja junto com o pedido. Ele mostra as duas medidas em
+      milímetros, que valem em qualquer tabela.
+    </p>
+    <div class="share-actions">
+      <a class="btn btn-solid btn-sm" data-both-whatsapp target="_blank" rel="noopener">
+        <Icon name="lucide:message-circle" class="size-4" aria-hidden="true" />
+        Mandar no WhatsApp
+      </a>
+      <button type="button" class="btn btn-ghost btn-sm" data-both-copy>
+        <Icon name="lucide:link" class="size-4" aria-hidden="true" />
+        <span data-copy-text>Copiar o link</span>
+      </button>
+    </div>
+  </div>
+</section>
+
+<script>
+  import { initCouple } from '../scripts/couple';
+
+  const panel = document.querySelector<HTMLElement>('[data-couple]');
+  const sizer = document.querySelector<HTMLElement>('[data-sizer]');
+  if (panel && sizer) initCouple(panel, sizer);
+</script>
+
+<style>
+  .couple {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @media (min-width: 640px) {
+    .couple {
+      padding: 1.5rem;
+    }
+  }
+
+  .couple-title {
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+  }
+
+  .couple-text {
+    margin-top: 0.5rem;
+    color: var(--color-ink-2);
+  }
+
+  .couple-note {
+    margin-top: 0.75rem;
+    padding: 0.625rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-gold-soft);
+    color: var(--color-ink);
+    font-size: var(--text-sm);
+  }
+
+  .couple-note[hidden],
+  .share[hidden] {
+    display: none;
+  }
+
+  .slots {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 560px) {
+    .slots {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .slot {
+    min-width: 0;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    background: var(--color-sunken);
+  }
+
+  .slot-label {
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink-3);
+  }
+
+  .slot-aro {
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl--line-height);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .slot-mm {
+    font-size: var(--text-sm);
+    color: var(--color-ink-2);
+  }
+
+  .slot-b {
+    margin-top: 0.25rem;
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+  }
+
+  .slot-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .slot-actions .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  .link-btn {
+    color: var(--color-accent-ink);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .share {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-line);
+  }
+
+  .share-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+  }
+</style>

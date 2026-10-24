@@ -491,6 +491,8 @@ export function initRingSizer(root: HTMLElement): void {
   function update(): void {
     current = measurement();
     result.hidden = current === null;
+    // Lets the page around the sizer react, e.g. the aliança page saving a size per person.
+    root.dispatchEvent(new CustomEvent<number | null>('sizer:result', { detail: current }));
     if (current === null) return;
     renderResult(sizeFromCircumference(current));
     renderStoreAnswer();
@@ -575,7 +577,7 @@ export function initRingSizer(root: HTMLElement): void {
     window.setTimeout(() => (copyLabel.textContent = original), 2500);
   });
 
-  one<HTMLButtonElement>('[data-restart]').addEventListener('click', () => {
+  function restart(): void {
     ringTouched = false;
     fingerInput.value = '';
     typedInput.value = '';
@@ -583,7 +585,10 @@ export function initRingSizer(root: HTMLElement): void {
     storeMmInput.value = '';
     update();
     root.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  });
+  }
+  one<HTMLButtonElement>('[data-restart]').addEventListener('click', restart);
+  // The aliança page asks for a fresh start when it moves on to the second person.
+  root.addEventListener('sizer:reset', restart);
 
   // ---- Panels, zoom and screen changes ----------------------------------------------------
 
