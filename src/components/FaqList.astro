@@ -1,0 +1,35 @@
+---
+import type { Faq } from '../lib/seo';
+
+interface Props {
+  faqs: readonly Faq[];
+}
+
+const { faqs } = Astro.props;
+---
+
+<div class="faq">
+  {faqs.map((f) => (
+    <details>
+      <summary>{f.q}</summary>
+      <p>{f.a}</p>
+    </details>
+  ))}
+</div>
+
+<style>
+  .faq details {
+    border-bottom: 1px solid var(--color-line);
+    padding: 0.875rem 0;
+  }
+
+  .faq summary {
+    cursor: pointer;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .faq details p {
+    margin: 0.5rem 0 0;
+  }
+</style>

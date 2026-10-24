@@ -1,0 +1,94 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import RingSizer from '../components/RingSizer.astro';
+import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
+
+const title = 'Medidor de Dedo Online – Descubra o Aro pela Volta do Dedo';
+const description =
+  'Meça a volta do dedo com uma tira de papel, digite a medida e veja o aro na hora, com o diâmetro em mm e o tamanho americano e europeu. Grátis e sem cadastro.';
+
+const faqs: Faq[] = [
+  {
+    q: 'O medidor de dedo online é preciso?',
+    a: 'É tão preciso quanto a sua medida. Com uma tira de papel bem enrolada, sem apertar, medida no fim do dia, o resultado costuma bater com a joalheria. Se tiver um anel que serve, medir o anel na tela é ainda mais preciso.',
+  },
+  {
+    q: 'Por que não medir a largura do dedo na tela?',
+    a: 'Porque o dedo não é redondo e afunda quando encosta na tela. A largura vista de cima não diz a volta com segurança. A volta medida com uma tira de papel é bem mais confiável.',
+  },
+  {
+    q: 'Quanto mede a volta do dedo de quem usa aro 16?',
+    a: 'Na tabela da maioria das joalherias, 5,6 cm (56 mm). Para qualquer aro, some 40 ao número para ter a volta em milímetros.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Medidor de dedo online"
+  description={description}
+  updated="2026-10-24"
+  schema={[
+    webApplication({
+      url: absolute('/medidor-de-dedo-online'),
+      name: 'Medidor de dedo online',
+      description,
+    }),
+    faqPage(absolute('/medidor-de-dedo-online'), faqs),
+  ]}
+  wide
+>
+  <div slot="tool">
+    <RingSizer initialMethod="finger" />
+  </div>
+
+  <h2>Como medir o dedo em casa</h2>
+  <ol>
+    <li>Recorte uma tira de papel com mais ou menos 1 cm de largura.</li>
+    <li>
+      Enrole na base do dedo em que o anel vai ficar, firme mas sem apertar. A tira tem que encostar
+      na pele por inteiro, sem dobrar.
+    </li>
+    <li>Marque com caneta o ponto onde a ponta encontra o papel.</li>
+    <li>Confira se a tira, fechada naquela marca, passa pela junta do dedo.</li>
+    <li>
+      Estique a tira numa régua e meça do começo até a marca. Digite essa medida no medidor acima.
+    </li>
+  </ol>
+
+  <h2>Erros que mudam o aro</h2>
+  <ul>
+    <li>
+      <strong>Usar barbante.</strong> Ele estica: puxado com força, dá uma medida menor que o dedo e
+      o anel chega apertado.
+    </li>
+    <li>
+      <strong>Medir de manhã ou com frio.</strong> O dedo fica menor. Meça no fim do dia, com a mão
+      em temperatura normal, e nunca logo depois de exercício, quando o dedo incha.
+    </li>
+    <li>
+      <strong>Esquecer a junta.</strong> Se ela for bem mais grossa que a base, meça as duas e use a
+      da junta, senão o anel não passa.
+    </li>
+    <li>
+      <strong>Medir o dedo errado.</strong> Cada dedo tem um tamanho, e a mão que você mais usa
+      costuma ser um pouco maior.
+    </li>
+  </ul>
+  <p>
+    Meça três vezes, em dias diferentes, e fique com a maior medida. Para alianças largas, de 6 mm
+    ou mais, considere um aro acima.
+  </p>
+
+  <h2>Da volta do dedo para o aro</h2>
+  <p>
+    Na tabela da maioria das joalherias, o aro é a volta em milímetros menos 40: 5,4 cm é o aro 14,
+    5,6 cm é o aro 16, 6,0 cm é o aro 20. A <a href="/tabela-de-medidas-de-anel">tabela completa</a>{' '}
+    tem todos os aros, e vale lembrar que{' '}
+    <a href="/por-que-o-aro-muda-de-loja-para-loja">algumas lojas usam outra tabela</a>.
+  </p>
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>

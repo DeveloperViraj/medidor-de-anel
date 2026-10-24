@@ -1,16 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import AroTable from '../components/AroTable.astro';
+import FaqList from '../components/FaqList.astro';
 import RingSizer from '../components/RingSizer.astro';
 import { SITE } from '../config/site';
-import { formatMm, formatMm2 } from '../lib/format';
 import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
-import { aroTable } from '../lib/sizes';
 
 const title = 'Medidor de Anel Online Grátis – Meça na Tela do Celular';
 const description =
   'Descubra o seu aro na tela do celular com um cartão ou uma moeda de R$ 1. Grátis, sem cadastro e sem app, com a medida em mm e o tamanho nos EUA e na Europa.';
-
-const rows = aroTable(10, 30);
 
 const faqs: Faq[] = [
   {
@@ -32,6 +30,10 @@ const faqs: Faq[] = [
   {
     q: 'Como medir o tamanho do anel sem ter um anel?',
     a: 'Escolha "Pelo dedo": enrole uma tira de papel na base do dedo, marque onde ela se encontra e meça com uma régua. Papel é melhor que barbante, porque não estica. Digite o comprimento e o aro aparece na hora.',
+  },
+  {
+    q: 'Tem medidor de anel para imprimir?',
+    a: 'Tem. O medidor para imprimir traz círculos de aro 8 a 30, uma tira para enrolar no dedo e uma régua e um contorno de cartão para conferir se a impressão saiu em tamanho real. É um PDF gratuito em A4.',
   },
   {
     q: 'Funciona no computador?',
@@ -89,7 +91,10 @@ const schema = [
       </ol>
       <p>
         Se você mudar o zoom do navegador ou trocar de tela, o medidor percebe e pede para calibrar
-        de novo, porque a medida antiga deixaria de valer.
+        de novo, porque a medida antiga deixaria de valer. Prefere papel? Use o{' '}
+        <a href="/medidor-de-anel-para-imprimir">medidor de anel para imprimir</a>. Vai comprar
+        alianças? O <a href="/medidor-de-alianca">medidor de aliança</a> mede os dois e junta as
+        medidas num link só.
       </p>
 
       <h2>Qual tabela de aro o medidor usa</h2>
@@ -104,40 +109,17 @@ const schema = [
         Existe uma segunda tabela, comum em semijoias e em anúncios de marketplace, que numera pelo
         diâmetro: nela o aro 16 tem 16,8 mm por dentro, em vez de 17,8 mm. O mesmo anel acaba
         ficando 2 a 3 números acima. Nenhuma das duas está errada, mas misturar as duas é a causa
-        mais comum de anel que chega apertado. Por isso o resultado sempre mostra os milímetros e
-        oferece um teste para descobrir qual tabela a loja usa.
+        mais comum de anel que chega apertado. Explicamos tudo, com as fontes, em{' '}
+        <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a>.
       </p>
 
       <h2>Tabela de aros: diâmetro e volta em mm</h2>
       <p>
         Aros mais usados, na tabela padrão. Para comparar com outra loja, use o diâmetro interno em
-        milímetros.
+        milímetros. A <a href="/tabela-de-medidas-de-anel">tabela completa</a> vai do aro 5 ao 35,
+        com Reino Unido e a outra tabela lado a lado.
       </p>
-      <div class="table-wrap">
-        <table class="aro-table">
-          <thead>
-            <tr>
-              <th scope="col">Aro</th>
-              <th scope="col">Diâmetro interno</th>
-              <th scope="col">Volta</th>
-              <th scope="col">EUA</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows.map((row) => (
-              <tr>
-                <th scope="row">{row.aro}</th>
-                <td class="num">{formatMm2(row.diameterMm)} mm</td>
-                <td class="num">
-                  {row.circumferenceMm} mm{' '}
-                  <span class="cell-sub">{formatMm(row.circumferenceMm / 10)} cm</span>
-                </td>
-                <td class="num">{row.us}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <AroTable caption="Aros 10 a 30: diâmetro interno, volta e tamanho americano" />
 
       <h2>Dicas para acertar o tamanho</h2>
       <ul>
@@ -166,16 +148,13 @@ const schema = [
           costuma ser um pouco maior.
         </li>
       </ul>
+      <p>
+        Mais detalhes, método por método, em{' '}
+        <a href="/como-medir-tamanho-de-anel">como medir o tamanho do anel</a>.
+      </p>
 
       <h2>Perguntas frequentes</h2>
-      <div class="faq">
-        {faqs.map((f) => (
-          <details>
-            <summary>{f.q}</summary>
-            <p>{f.a}</p>
-          </details>
-        ))}
-      </div>
+      <FaqList faqs={faqs} />
 
       <p class="mt-10 text-sm text-ink-3">
         {SITE.name} é um projeto independente: não vendemos joias e não somos ligados a nenhuma
@@ -184,75 +163,3 @@ const schema = [
     </article>
   </div>
 </BaseLayout>
-
-<style>
-  .table-wrap {
-    overflow-x: auto;
-    margin: 1rem 0 1.5rem;
-    border: 1px solid var(--color-line);
-    border-radius: var(--radius-md);
-    background: var(--color-surface);
-  }
-
-  .aro-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: var(--text-sm);
-  }
-
-  .aro-table th,
-  .aro-table td {
-    padding: 0.5rem;
-    text-align: left;
-    border-bottom: 1px solid var(--color-line);
-    white-space: nowrap;
-  }
-
-  @media (min-width: 640px) {
-    .aro-table th,
-    .aro-table td {
-      padding: 0.5rem 0.875rem;
-    }
-  }
-
-  .cell-sub {
-    display: block;
-    font-size: var(--text-xs);
-    color: var(--color-ink-3);
-  }
-
-  .aro-table thead th {
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-ink-3);
-    background: var(--color-surface-2);
-  }
-
-  .aro-table tbody th {
-    font-family: var(--font-display);
-    font-size: var(--text-base);
-    color: var(--color-ink);
-  }
-
-  .aro-table tbody tr:last-child > * {
-    border-bottom: 0;
-  }
-
-  .aro-table td {
-    color: var(--color-ink-2);
-  }
-
-  .faq details {
-    border-bottom: 1px solid var(--color-line);
-    padding: 0.875rem 0;
-  }
-
-  .faq summary {
-    cursor: pointer;
-    font-weight: var(--font-weight-semibold);
-    color: var(--color-ink);
-  }
-
-  .faq details p {
-    margin: 0.5rem 0 0;
-  }
-</style>

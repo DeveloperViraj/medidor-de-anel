@@ -1,0 +1,244 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { formatMm } from '../lib/format';
+import { absolute, faqPage, type Faq } from '../lib/seo';
+import {
+  aroFromCircumference,
+  aroScaleBFromCircumference,
+  circumferenceFromDiameter,
+} from '../lib/sizes';
+
+const title = 'Por Que o Aro do Anel Muda de Loja para Loja: as 2 Tabelas';
+const description =
+  'No Brasil existem duas tabelas de aro, e o mesmo anel pode ser aro 16 numa loja e aro 19 em outra. Veja quem usa cada uma e como acertar o tamanho em qualquer loja.';
+
+// The same rings on both tables, computed by the size engine.
+const rings = [15.5, 16, 16.5, 17, 17.5, 17.8, 18.5, 19, 19.5, 20, 21].map((diameter) => {
+  const circumference = circumferenceFromDiameter(diameter);
+  return {
+    diameter,
+    a: Math.round(aroFromCircumference(circumference)),
+    b: Math.round(aroScaleBFromCircumference(circumference)),
+  };
+});
+
+const faqs: Faq[] = [
+  {
+    q: 'Qual das duas tabelas está certa?',
+    a: 'As duas são usadas de verdade; o erro é misturar. A tabela da volta menos 40 é a da maioria das joalherias e a mesma da Itália e da Espanha. A tabela por diâmetro aparece mais em semijoias e anúncios de marketplace. O que vale é a tabela da loja onde você vai comprar.',
+  },
+  {
+    q: 'Como saber qual tabela a loja usa?',
+    a: 'Procure a tabela de medidas da loja e veja quanto mede um aro qualquer. Se o aro 16 tiver uns 17,8 mm de diâmetro (ou 5,6 cm de volta), é a tabela padrão. Se tiver 16,8 mm, é a tabela por diâmetro. O medidor faz essa conta para você no resultado, em "Descobrir qual tabela a loja usa".',
+  },
+  {
+    q: 'A loja não mostra a tabela. O que eu faço?',
+    a: 'Pergunte à loja quantos milímetros tem o aro que você quer, de diâmetro interno ou de volta. Com esse número, compare com a sua medida em milímetros.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Por que o aro muda de loja para loja"
+  description={description}
+  updated="2026-10-24"
+  schema={[faqPage(absolute('/por-que-o-aro-muda-de-loja-para-loja'), faqs)]}
+>
+  <div class="tldr">
+    <p>
+      <strong>Resumo:</strong> o mesmo anel de 17,8 mm por dentro é o <strong>aro 16</strong> na
+      tabela da maioria das joalherias e o <strong>aro 19</strong> na tabela por diâmetro que
+      algumas lojas usam. Antes de comprar, compare sempre a medida em milímetros.
+    </p>
+  </div>
+
+  <h2>As duas tabelas de aro no Brasil</h2>
+
+  <h3>1. A tabela padrão: volta do dedo em mm menos 40</h3>
+  <p>
+    O número do aro é a volta do dedo em milímetros menos 40. Uma volta de 5,6 cm (56 mm) é o aro
+    16; uma de 6,0 cm é o aro 20. É a mesma numeração da Itália, da Espanha e da Suíça.
+  </p>
+  <p>Encontramos essa tabela, por exemplo:</p>
+  <ul>
+    <li>
+      no guia de medidas da <strong>Vivara</strong>, que liga a volta do dedo ao aro de 4,5 cm (aro
+      5) a 7,0 cm (aro 30) e explica que &quot;a medida em centímetros encontrada na régua indica o
+      número do seu aro&quot;;
+    </li>
+    <li>
+      no guia da <strong>JK Alianças</strong>: &quot;o número do aro é a circunferência interna do
+      anel em milímetros menos 40&quot;;
+    </li>
+    <li>
+      nos medidores virtuais da <strong>Gazin</strong> e da <strong>Só Prata</strong>;
+    </li>
+    <li>
+      na entrevista com um ourives de mais de 39 anos de profissão, num trabalho da Universidade
+      Federal do Acre (2016): o aro 10 é o dedo de 5 cm, e cada milímetro a mais é um número a mais.
+    </li>
+  </ul>
+
+  <h3>2. A tabela por diâmetro: aro 16 = 16,8 mm</h3>
+  <p>
+    Aqui o aro 16 tem 16,8 mm de diâmetro interno, o aro 19 tem 17,8 mm e o aro 22 tem 18,8 mm: um
+    terço de milímetro por número. O mesmo anel acaba ficando de 2 a 3 números acima da tabela
+    padrão. Encontramos essa numeração em anúncios de joias em marketplaces (Extra, Casas Bahia,
+    Ponto Frio), no guia da Isi Laurier (&quot;Aro 16 corresponde a cerca de 5,3 cm&quot;) e nos
+    medidores virtuais de algumas marcas de joias e semijoias, como Macchi e ArtCoco.
+  </p>
+
+  <h2>O mesmo anel nas duas tabelas</h2>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th scope="col">Diâmetro interno do anel</th>
+          <th scope="col">Tabela padrão</th>
+          <th scope="col">Tabela por diâmetro</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rings.map((ring) => (
+          <tr>
+            <th scope="row" class="num">
+              {formatMm(ring.diameter)} mm
+            </th>
+            <td class="num">aro {ring.a}</td>
+            <td class="num">aro {ring.b}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p>
+    A diferença é de uns 3 números nos anéis finos e cai para uns 2 nos grossos, porque a tabela por
+    diâmetro cresce um pouco mais rápido de um número para o outro.
+  </p>
+
+  <h2>E a norma da ABNT?</h2>
+  <p>
+    Existe uma norma brasileira sobre o assunto: a ABNT NBR 16058, &quot;Joias – Tamanhos de anéis –
+    Classificação&quot;, publicada em 2012 e revisada em 2013, baseada na norma internacional ISO
+    8653. O texto é vendido pela ABNT e não é público, e não conseguimos confirmar qual das duas
+    tabelas ela adota. Por isso não dizemos que seguimos a norma. Na prática, cada fabricante e cada
+    loja escolhe a tabela que usa.
+  </p>
+
+  <h2>Como acertar o tamanho em qualquer loja</h2>
+  <ol>
+    <li>
+      <strong>Tenha a sua medida em milímetros</strong>: o diâmetro interno de um anel que serve, ou
+      a volta do dedo. O <a href="/#medidor">medidor de anel</a> mostra os dois.
+    </li>
+    <li>
+      <strong>Abra a tabela de medidas da loja</strong> e veja quantos milímetros tem o aro que você
+      vai pedir.
+    </li>
+    <li>
+      <strong>Use o teste do medidor:</strong> no resultado, em &quot;Descobrir qual tabela a loja
+      usa&quot;, digite um aro da loja e a medida dele. O medidor diz qual aro pedir ali.
+    </li>
+    <li>
+      <strong>Sem tabela na loja?</strong> Pergunte quantos milímetros tem o aro, de diâmetro ou de
+      volta, antes de fechar a compra.
+    </li>
+  </ol>
+
+  <ToolCta />
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+
+  <h2>Fontes</h2>
+  <ul class="sources">
+    <li>Vivara, guia de tamanhos de anéis (vivara.com.br), consultado em outubro de 2026.</li>
+    <li>
+      JK Alianças,{' '}
+      <a href="https://www.jkaliancas.com.br/guias/tabela-de-tamanho-de-alianca" rel="nofollow">
+        tabela de tamanho de aliança
+      </a>
+      .
+    </li>
+    <li>
+      Barreto e Souza,{' '}
+      <a
+        href="https://periodicos.ufac.br/index.php/simposioufac/article/view/917/514"
+        rel="nofollow"
+      >
+        Conceitos matemáticos com uso do anel de formatura
+      </a>
+      , UFAC, 2016.
+    </li>
+    <li>
+      Isi Laurier,{' '}
+      <a href="https://www.isilaurier.com.br/pages/guia-de-tamanhos" rel="nofollow">
+        guia de tamanhos
+      </a>
+      .
+    </li>
+    <li>
+      ABNT NBR 16058,{' '}
+      <a
+        href="https://www.normas.com.br/visualizar/abnt-nbr-nm/31853/abnt-nbr16058-joias-tamanhos-de-aneis-classificacao"
+        rel="nofollow"
+      >
+        ficha no catálogo da Target
+      </a>
+      .
+    </li>
+  </ul>
+</DocLayout>
+
+<style>
+  .tldr {
+    margin-bottom: 1.5rem;
+    padding: 1rem 1.25rem;
+    border-radius: var(--radius-md);
+    background: var(--color-gold-soft);
+    color: var(--color-ink);
+  }
+
+  .cmp-wrap {
+    overflow-x: auto;
+    margin: 1rem 0;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .cmp {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .cmp th,
+  .cmp td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cmp thead th {
+    color: var(--color-ink-3);
+    font-weight: var(--font-weight-semibold);
+    background: var(--color-surface-2);
+  }
+
+  .cmp tbody th {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .cmp tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .sources {
+    font-size: var(--text-sm);
+  }
+</style>

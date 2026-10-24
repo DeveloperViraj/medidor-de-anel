@@ -7,24 +7,37 @@
  * calibration is remembered when localStorage is available and simply asked for again when not.
  */
 import { Icon } from 'astro-icon/components';
+
+interface Props {
+  /** The method selected when the page opens. */
+  initialMethod?: 'ring' | 'finger' | 'typed';
+}
+
+const { initialMethod = 'ring' } = Astro.props;
 ---
 
-<section id="medidor" class="sizer" data-sizer aria-label="Medidor de anel">
+<section
+  id="medidor"
+  class="sizer"
+  data-sizer
+  data-initial-method={initialMethod}
+  aria-label="Medidor de anel"
+>
   <fieldset class="min-w-0">
     <legend class="mb-2 text-sm font-semibold text-ink-2">Como você quer medir?</legend>
     <div class="seg">
       <label>
-        <input type="radio" name="method" value="ring" checked />
+        <input type="radio" name="method" value="ring" checked={initialMethod === 'ring'} />
         <Icon name="lucide:gem" class="seg-icon" aria-hidden="true" />
         Com anel
       </label>
       <label>
-        <input type="radio" name="method" value="finger" />
+        <input type="radio" name="method" value="finger" checked={initialMethod === 'finger'} />
         <Icon name="lucide:hand" class="seg-icon" aria-hidden="true" />
         Pelo dedo
       </label>
       <label>
-        <input type="radio" name="method" value="typed" />
+        <input type="radio" name="method" value="typed" checked={initialMethod === 'typed'} />
         <Icon name="lucide:keyboard" class="seg-icon" aria-hidden="true" />
         Digitar
       </label>
@@ -140,7 +153,7 @@ import { Icon } from 'astro-icon/components';
       </button>
     </div>
     <p class="step-text" data-cal-hint="card-upright">
-      Deixe o celular <strong>deitado na mesa</strong> e coloque um cartão de banco
+      Deixe o celular <strong>deitado na mesa</strong> e coloque um cartão de banco{' '}
       <strong>em pé</strong> em cima do desenho, com o canto de cima encaixado no canto preto.
       Depois ajuste até as duas linhas coloridas encostarem na borda direita e na de baixo do
       cartão. Olhe bem de cima, não de lado.

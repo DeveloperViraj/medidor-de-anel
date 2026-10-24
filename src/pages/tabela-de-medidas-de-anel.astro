@@ -1,0 +1,159 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import AroTable from '../components/AroTable.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { formatCm, formatMm, formatMm2 } from '../lib/format';
+import { absolute, faqPage, type Faq } from '../lib/seo';
+import { aroTable, ARO_MAX, ARO_MIN } from '../lib/sizes';
+
+const title = 'Tabela de Medidas de Anel: Aro em mm e cm (5 ao 35)';
+const description =
+  'Tabela de aro de anel completa, do 5 ao 35: diâmetro interno e volta em mm e cm, tamanho americano, britânico e europeu, e o mesmo aro na tabela por diâmetro.';
+
+// Answers generated from the size engine, so they always match the table.
+const byAro = new Map(aroTable().map((row) => [row.aro, row]));
+const answer = (aro: number): Faq => {
+  const row = byAro.get(aro)!;
+  return {
+    q: `Anel aro ${aro} tem quantos cm e quantos mm?`,
+    a: `Na tabela da maioria das joalherias, o aro ${aro} tem ${formatCm(row.circumferenceMm)} cm (${row.circumferenceMm} mm) de volta e ${formatMm2(row.diameterMm)} mm de diâmetro interno. Nos Estados Unidos equivale ao tamanho ${row.us}. Em lojas que usam a tabela por diâmetro, o aro ${aro} é menor: ${formatMm(row.diameterScaleBMm)} mm por dentro.`,
+  };
+};
+
+const faqs: Faq[] = [
+  answer(16),
+  answer(18),
+  answer(20),
+  answer(22),
+  {
+    q: 'Como saber o aro pela medida em centímetros?',
+    a: 'Multiplique os centímetros por 10 e tire 40. Uma volta de 5,6 cm é 56 mm, que dá aro 16; 6,2 cm dá aro 22. Se a medida for o diâmetro do anel em milímetros, multiplique por 3,1416 antes.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Tabela de medidas de anel"
+  description={description}
+  updated="2026-10-24"
+  schema={[faqPage(absolute('/tabela-de-medidas-de-anel'), faqs)]}
+  wide
+>
+  <div slot="tool" class="lookup" data-lookup>
+    <label class="block min-w-0">
+      <span class="mb-1.5 block text-sm font-semibold text-ink-2">
+        Tem a volta do dedo em cm? Digite aqui
+      </span>
+      <input
+        type="text"
+        inputmode="decimal"
+        autocomplete="off"
+        class="field"
+        placeholder="ex.: 5,6"
+        data-lookup-input
+      />
+    </label>
+    <p class="lookup-out" data-lookup-out aria-live="polite">
+      O aro aparece aqui. Para a medida de um anel, use o <a href="/#medidor">medidor na tela</a>.
+    </p>
+  </div>
+
+  <p>
+    A regra da tabela padrão é simples:{' '}
+    <strong>o aro é a volta do dedo em milímetros menos 40</strong>. É a numeração do guia de
+    medidas da Vivara, de fabricantes de alianças e da maioria das joalherias brasileiras, a mesma
+    usada na Itália e na Espanha. O diâmetro é a volta dividida por π (3,1416).
+  </p>
+  <p>
+    A última coluna mostra quanto o mesmo número mede nas lojas que usam a{' '}
+    <a href="/por-que-o-aro-muda-de-loja-para-loja">tabela por diâmetro</a>, comum em semijoias e
+    marketplaces. Na dúvida, compare sempre o diâmetro em milímetros com a tabela da loja.
+  </p>
+
+  <h2>
+    Tabela completa: aro {ARO_MIN} ao {ARO_MAX}
+  </h2>
+  <AroTable
+    from={ARO_MIN}
+    to={ARO_MAX}
+    uk
+    scaleB
+    caption={`Aros ${ARO_MIN} a ${ARO_MAX}: diâmetro, volta, EUA, Reino Unido e tabela por diâmetro`}
+  />
+  <p class="text-sm">
+    EUA: tamanhos com meio número, pela regra de 0,032 polegada de diâmetro por tamanho. Reino
+    Unido: letras pela norma britânica BS 6820, arredondadas para a meia letra mais próxima; as
+    tabelas britânicas variam alguns décimos de milímetro, por isso o sinal ≈. Europa: o tamanho é a
+    própria volta em milímetros (ISO 8653), então é só somar 40 ao aro.
+  </p>
+
+  <h2>Como usar a tabela</h2>
+  <ul>
+    <li>
+      <strong>Tem um anel que serve?</strong> Meça o diâmetro de dentro, de borda a borda, e procure
+      o valor mais próximo na coluna de diâmetro. O <a href="/#medidor">medidor na tela</a> faz isso
+      com precisão de décimo de milímetro.
+    </li>
+    <li>
+      <strong>Mediu o dedo com uma tira de papel?</strong> Procure o comprimento na coluna de volta,
+      ou use o campo acima.
+    </li>
+    <li>
+      <strong>Comprando de fora?</strong> Veja a coluna dos EUA ou use o{' '}
+      <a href="/converter-tamanho-de-anel">conversor de tamanho de anel</a>.
+    </li>
+  </ul>
+
+  <ToolCta />
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>
+
+<script>
+  import { formatMm, parseDecimal } from '../lib/format';
+  import { isPlausibleCircumference, sizeFromCircumference } from '../lib/sizes';
+
+  const box = document.querySelector<HTMLElement>('[data-lookup]');
+  const input = box?.querySelector<HTMLInputElement>('[data-lookup-input]');
+  const out = box?.querySelector<HTMLElement>('[data-lookup-out]');
+  if (box && input && out) {
+    const initial = out.innerHTML;
+    input.addEventListener('input', () => {
+      const value = parseDecimal(input.value);
+      if (!input.value.trim()) {
+        out.innerHTML = initial;
+        return;
+      }
+      // People type centimetres (5,6) or millimetres (56); both are accepted.
+      const mm = value < 10 ? value * 10 : value;
+      if (Number.isNaN(value) || !isPlausibleCircumference(mm)) {
+        out.textContent = 'Digite a volta do dedo, por exemplo 5,6 (cm) ou 56 (mm).';
+        return;
+      }
+      const size = sizeFromCircumference(mm);
+      const between = size.aro.between
+        ? ` Ficou entre o ${size.aro.between[0]} e o ${size.aro.between[1]}: na dúvida, o maior.`
+        : '';
+      out.textContent = `${formatMm(mm)} mm de volta é o aro ${size.aro.aro} (${formatMm(size.diameterMm)} mm de diâmetro).${between}`;
+    });
+  }
+</script>
+
+<style>
+  .lookup {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .lookup-out {
+    margin-top: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+</style>

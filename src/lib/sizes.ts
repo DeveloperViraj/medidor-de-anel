@@ -99,6 +99,70 @@ export function formatUk(index: number): string {
   return half - whole === 0.5 ? `${letter}½` : letter;
 }
 
+const FRACTIONS: Record<string, number> = { '½': 0.5, '¼': 0.25, '¾': 0.75 };
+
+/**
+ * Reads a US size as people type it: "7", "7,5", "7.5", "7½", "7 1/2", "7 3/4". Returns NaN for
+ * anything else, so the page can say so instead of guessing.
+ */
+export function parseUsSize(input: string): number {
+  const s = input.trim().replace(',', '.');
+  const glyph = s.match(/^(\d{1,2})?\s*([½¼¾])$/);
+  if (glyph) return Number(glyph[1] ?? 0) + FRACTIONS[glyph[2]];
+  const fraction = s.match(/^(\d{1,2})\s+([13])\/([24])$/);
+  if (fraction) {
+    const value = Number(fraction[2]) / Number(fraction[3]);
+    return value < 1 ? Number(fraction[1]) + value : Number.NaN;
+  }
+  return /^\d{1,2}(\.\d{1,2})?$/.test(s) ? Number(s) : Number.NaN;
+}
+
+/**
+ * Reads a UK/Australian size: a letter with an optional half ("N", "n½", "N 1/2") or a size past Z
+ * ("Z+2", "Z2"). Returns the index used by circumferenceFromUkIndex (A = 0), or NaN.
+ */
+export function parseUkSize(input: string): number {
+  const s = input.trim().toUpperCase().replace(/\s+/g, ' ');
+  const past = s.match(/^Z\s*\+?\s*([1-6])$/);
+  if (past) return 25 + Number(past[1]);
+  const letter = s.match(/^([A-Z])\s*(½|1\/2)?$/);
+  if (!letter) return Number.NaN;
+  return letter[1].charCodeAt(0) - 65 + (letter[2] ? 0.5 : 0);
+}
+
+export type SizeSystem = 'aro' | 'aroB' | 'us' | 'eu' | 'uk' | 'diameter';
+
+/**
+ * Inner circumference in mm for a size typed in any system, or NaN when the input is not a size
+ * in that system (or not a plausible finger). The converter builds every other system from this.
+ */
+export function circumferenceFromSystem(system: SizeSystem, input: string): number {
+  const number = Number(input.trim().replace(',', '.'));
+  let circumference: number;
+  switch (system) {
+    case 'aro':
+      circumference = circumferenceFromAro(number);
+      break;
+    case 'aroB':
+      circumference = circumferenceFromDiameter(diameterFromAroScaleB(number));
+      break;
+    case 'eu':
+      circumference = number;
+      break;
+    case 'diameter':
+      circumference = circumferenceFromDiameter(number);
+      break;
+    case 'us':
+      circumference = circumferenceFromUs(parseUsSize(input));
+      break;
+    case 'uk':
+      circumference = circumferenceFromUkIndex(parseUkSize(input));
+      break;
+  }
+  if (input.trim() === '' || !isPlausibleCircumference(circumference)) return Number.NaN;
+  return circumference;
+}
+
 export interface Neighbours {
   /** Nearest whole aro. */
   aro: number;

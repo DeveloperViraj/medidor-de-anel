@@ -1,0 +1,57 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import { SITE } from '../config/site';
+---
+
+<DocLayout
+  title="Sobre o Medidor de Anel"
+  heading="Sobre o Medidor de Anel"
+  description="Um medidor de anel online gratuito, independente e feito para o Brasil: sem cadastro, sem app e sem cobrança."
+  crumb="Sobre"
+>
+  <h2>O que é</h2>
+  <p>
+    O {SITE.name} é uma ferramenta gratuita para descobrir o tamanho do anel em casa, pela tela do
+    celular ou do computador, com uma tira de papel ou com uma folha impressa. Funciona no
+    navegador, sem instalar nada e sem criar conta.
+  </p>
+
+  <h2>Por que existe</h2>
+  <p>
+    Quem procura &quot;medidor de anel&quot; costuma cair em aplicativos que pedem cadastro, mostram
+    anúncios antes de medir ou cobram assinatura para mostrar o resultado. E, mesmo depois de medir,
+    muita gente recebe o anel errado, porque as lojas brasileiras não usam todas a mesma tabela de
+    aro. Este site resolve as duas coisas: mede de graça e explica a medida em milímetros, que vale
+    em qualquer loja.
+  </p>
+
+  <h2>Como cuidamos da precisão</h2>
+  <ul>
+    <li>
+      As contas de tamanho seguem fontes que dá para conferir: a norma internacional ISO 8653, as
+      tabelas publicadas por joalherias brasileiras, a norma britânica BS 6820 e as tabelas
+      americanas. Cada conversão é testada automaticamente contra valores publicados.
+    </li>
+    <li>
+      O cartão de banco tem 85,6 × 53,98 mm (norma ISO/IEC 7810) e a moeda de R$ 1 tem 27 mm,
+      segundo o Banco Central do Brasil.
+    </li>
+    <li>
+      Quando uma informação não pôde ser confirmada, dizemos isso, como no caso da{' '}
+      <a href="/por-que-o-aro-muda-de-loja-para-loja">norma ABNT de tamanhos de anel</a>, cujo texto
+      não é público.
+    </li>
+  </ul>
+
+  <h2>Independente</h2>
+  <p>
+    O site não vende joias e não é ligado a nenhuma loja ou marca. Os nomes de lojas que aparecem
+    nas páginas servem só para mostrar qual tabela de aro cada uma usa.
+  </p>
+
+  <h2>Fale com a gente</h2>
+  <p>
+    Achou um erro, uma tabela diferente ou tem uma sugestão? Veja a página de{' '}
+    <a href="/contato">contato</a>.
+  </p>
+</DocLayout>

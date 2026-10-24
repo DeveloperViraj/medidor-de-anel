@@ -1,0 +1,68 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import ContactLine from '../components/ContactLine.astro';
+import { SITE } from '../config/site';
+---
+
+<DocLayout
+  title="Política de Privacidade"
+  description={`Como o ${SITE.name} trata os seus dados: as medidas ficam no seu aparelho, o site não usa cookies e não pede cadastro.`}
+  crumb="Privacidade"
+>
+  <p class="text-sm">Última atualização: 24 de outubro de 2026.</p>
+
+  <h2>Resumo</h2>
+  <ul>
+    <li>Não pedimos cadastro, nome, e-mail ou telefone para usar o medidor.</li>
+    <li>As medidas são calculadas no seu aparelho e não são enviadas para nós.</li>
+    <li>O site não usa cookies nem ferramentas de estatística ou de anúncios.</li>
+  </ul>
+
+  <h2>Quem é o responsável</h2>
+  <p>
+    O controlador dos dados, nos termos da Lei Geral de Proteção de Dados (Lei 13.709/2018), é o
+    responsável pelo site {SITE.name} ({SITE.domain}). Para qualquer assunto sobre privacidade,
+    escreva para <ContactLine />.
+  </p>
+
+  <h2>O que fica guardado no seu aparelho</h2>
+  <p>
+    Para você não precisar repetir a calibração, o navegador guarda no seu próprio aparelho
+    (localStorage) a escala da tela calibrada e, no medidor de aliança, as medidas que você salvar.
+    Também guardamos a escolha entre tema claro e escuro. Esses dados não saem do seu aparelho e não
+    são enviados para nós. Você pode apagá-los a qualquer momento limpando os dados do site nas
+    configurações do navegador.
+  </p>
+
+  <h2>Links compartilhados</h2>
+  <p>
+    Quando você copia ou envia o link de um resultado, o endereço leva só a medida em milímetros
+    (por exemplo, <code>?c=56.0</code>). Nenhum nome ou dado pessoal vai no link.
+  </p>
+
+  <h2>Dados técnicos da conexão</h2>
+  <p>
+    Como em qualquer site, o servidor recebe dados técnicos de cada acesso, como o endereço IP e o
+    tipo de navegador, para entregar as páginas e proteger o site contra abusos. O site é hospedado
+    pela Cloudflare, que processa esses dados como operadora, em servidores que podem ficar fora do
+    Brasil. Não usamos esses dados para identificar você nem para mostrar publicidade.
+  </p>
+
+  <h2>Estatísticas e anúncios</h2>
+  <p>
+    Hoje o site não usa nenhuma ferramenta de estatística nem de anúncios. Se isso mudar, esta
+    página será atualizada antes, e qualquer recurso que dependa do seu consentimento só será
+    ativado depois que você concordar.
+  </p>
+
+  <h2>Seus direitos</h2>
+  <p>
+    A LGPD garante a você, entre outros, o direito de saber se tratamos dados seus, de acessá-los,
+    de corrigi-los e de pedir que sejam apagados. Como o site não guarda dados pessoais em
+    servidores próprios, na prática não há o que consultar ou apagar do nosso lado. Mesmo assim,
+    você pode fazer qualquer pedido pelo contato acima.
+  </p>
+
+  <h2>Crianças</h2>
+  <p>O site não é direcionado a crianças e não coleta dados de ninguém, de nenhuma idade.</p>
+</DocLayout>

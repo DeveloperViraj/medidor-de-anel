@@ -1,0 +1,10 @@
+---
+/** The contact address, or a holding line until the owner publishes one (SITE.contactEmail). */
+import { SITE } from '../config/site';
+---
+
+{SITE.contactEmail ? (
+  <a href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>
+) : (
+  <span>o e-mail de contato, que será publicado aqui em breve</span>
+)}

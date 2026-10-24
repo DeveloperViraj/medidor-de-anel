@@ -1,0 +1,187 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { absolute, faqPage, type Faq } from '../lib/seo';
+
+const title = 'Como Medir o Tamanho do Anel em Casa: 5 Jeitos que Funcionam';
+const description =
+  'Cinco jeitos de descobrir o tamanho do anel, do mais preciso ao mais aproximado: na tela do celular, impresso, pelo dedo com papel, na joalheria ou com régua.';
+
+const faqs: Faq[] = [
+  {
+    q: 'Qual é o jeito mais preciso de medir em casa?',
+    a: 'Medir um anel que já serve no mesmo dedo, na tela calibrada do celular ou nos círculos impressos em tamanho real. Um anel é rígido, então não depende de quanto você aperta, como a medida do dedo.',
+  },
+  {
+    q: 'Posso medir o anel com uma régua comum?',
+    a: 'Pode, mas é aproximado. A régua marca milímetros, e meio milímetro de diâmetro já muda o aro em um número e meio. Serve para conferir, não para decidir entre dois números.',
+  },
+  {
+    q: 'Por que não usar barbante?',
+    a: 'Barbante estica e afunda na pele: puxado com força, dá uma medida menor que o dedo e o anel chega apertado. Uma tira de papel de 1 cm de largura é melhor.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Como medir o tamanho do anel"
+  description={description}
+  updated="2026-10-24"
+  schema={[faqPage(absolute('/como-medir-tamanho-de-anel'), faqs)]}
+>
+  <h2>Os 5 jeitos, lado a lado</h2>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th scope="col">Jeito</th>
+          <th scope="col">Precisa de</th>
+          <th scope="col">Precisão</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">Aneleira na joalheria</th>
+          <td>Ir até uma loja</td>
+          <td>A mais confiável</td>
+        </tr>
+        <tr>
+          <th scope="row">Anel na tela do celular</th>
+          <td>Um anel que serve e um cartão</td>
+          <td>Muito boa, em décimos de mm</td>
+        </tr>
+        <tr>
+          <th scope="row">Círculos impressos</th>
+          <td>Impressora e um anel</td>
+          <td>Muito boa, se imprimir em 100%</td>
+        </tr>
+        <tr>
+          <th scope="row">Dedo com tira de papel</th>
+          <td>Papel, caneta e régua</td>
+          <td>Boa, com cuidado</td>
+        </tr>
+        <tr>
+          <th scope="row">Régua em cima do anel</th>
+          <td>Só uma régua</td>
+          <td>Aproximada</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>1. Com um anel que já serve, na tela do celular</h2>
+  <p>
+    É o jeito mais rápido e um dos mais precisos. Calibre a tela com um cartão de banco ou uma moeda
+    de R$ 1, deite o anel em cima do círculo e ajuste até a borda encostar na parte de dentro do
+    anel. O <a href="/#medidor">medidor de anel online</a> mostra o aro, o diâmetro e a volta em
+    milímetros.
+  </p>
+  <p>
+    Use um anel do mesmo dedo em que o novo vai ficar: cada dedo tem um tamanho, e o da mão que você
+    mais usa costuma ser um pouco maior. Olhe a tela bem de cima, não de lado.
+  </p>
+
+  <h2>2. Com um anel, nos círculos impressos</h2>
+  <p>
+    O <a href="/medidor-de-anel-para-imprimir">medidor de anel para imprimir</a> traz círculos do
+    aro 8 ao 30. Imprima em tamanho real, confira com o contorno do cartão e a régua da própria
+    folha e apoie o anel sobre os círculos até achar o que coincide com a borda de dentro.
+  </p>
+
+  <h2>3. Pelo dedo, com uma tira de papel</h2>
+  <ol>
+    <li>Recorte uma tira de papel com mais ou menos 1 cm de largura.</li>
+    <li>Enrole na base do dedo, firme mas sem apertar.</li>
+    <li>Marque com caneta onde a ponta encontra o papel e veja se a tira passa pela junta.</li>
+    <li>Estique a tira numa régua e meça do começo até a marca.</li>
+    <li>
+      Digite o comprimento em <a href="/medidor-de-dedo-online">medidor de dedo</a>, ou tire 40 dos
+      milímetros: 56 mm de volta é o aro 16.
+    </li>
+  </ol>
+  <p>
+    Meça três vezes, em dias diferentes, sempre no fim do dia, e fique com a maior medida. Se a
+    junta for bem mais grossa que a base do dedo, meça as duas e use a da junta: o anel precisa
+    passar por ela.
+  </p>
+
+  <h2>4. Na joalheria, com a aneleira</h2>
+  <p>
+    A aneleira é um jogo de anéis de prova, um de cada número. Você prova até achar o que entra
+    passando pela junta e não gira solto. É o jeito mais confiável, porque você sente o anel no
+    dedo, e vale a pena para alianças largas: peça um anel de prova da mesma largura da aliança.
+  </p>
+
+  <h2>5. Com uma régua em cima do anel</h2>
+  <p>
+    Deite o anel numa régua e meça de uma borda de dentro à outra, passando pelo centro. Funciona
+    para ter uma ideia, mas a régua só marca milímetros, e meio milímetro de diâmetro muda o aro em
+    um número e meio. Para decidir o número, use um dos jeitos acima.
+  </p>
+
+  <ToolCta />
+
+  <h2>Cuidados que valem para todos</h2>
+  <ul>
+    <li>
+      <strong>Meça no fim do dia</strong>, com a mão em temperatura normal. De manhã e no frio o
+      dedo fica menor; logo depois de exercício ou de comida muito salgada, fica inchado.
+    </li>
+    <li>
+      <strong>Alianças e anéis largos ficam mais justos.</strong> A partir de uns 6 mm de largura,
+      considere um número acima.
+    </li>
+    <li>
+      <strong>Ficou entre dois números?</strong> Escolha o maior. Anéis de aço inox normalmente não
+      podem ser ajustados depois.
+    </li>
+    <li>
+      <strong>Confira a tabela da loja.</strong> No Brasil existem duas tabelas de aro; veja{' '}
+      <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a>.
+    </li>
+  </ul>
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>
+
+<style>
+  .cmp-wrap {
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .cmp {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .cmp th,
+  .cmp td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cmp thead th {
+    color: var(--color-ink-3);
+    font-weight: var(--font-weight-semibold);
+    background: var(--color-surface-2);
+  }
+
+  .cmp tbody th {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .cmp tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+</style>

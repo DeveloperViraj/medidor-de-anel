@@ -1,0 +1,47 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import { SITE } from '../config/site';
+---
+
+<DocLayout
+  title="Termos de Uso"
+  description={`As regras para usar o ${SITE.name}: ferramenta gratuita, resultado como orientação e a tabela da loja como referência final.`}
+  crumb="Termos de uso"
+>
+  <p class="text-sm">Última atualização: 24 de outubro de 2026.</p>
+
+  <h2>Uso gratuito</h2>
+  <p>
+    O {SITE.name} pode ser usado de graça, sem cadastro. Ao usar o site, você concorda com estes
+    termos.
+  </p>
+
+  <h2>O resultado é uma orientação</h2>
+  <p>
+    O tamanho mostrado depende da calibração da tela, da forma como o anel ou o dedo foi medido e da
+    tabela de aro usada. Fazemos o possível para que as contas sejam exatas, mas o resultado é uma
+    orientação, não uma garantia. Antes de comprar, confira a medida em milímetros com a tabela da
+    loja, e prefira lojas que façam ajuste ou troca de tamanho.
+  </p>
+
+  <h2>Responsabilidade</h2>
+  <p>
+    Não nos responsabilizamos por compras, ajustes, trocas ou devoluções feitas com base nas medidas
+    do site. As condições de cada compra são as da loja onde você comprar.
+  </p>
+
+  <h2>Links para outros sites</h2>
+  <p>
+    Algumas páginas citam ou levam a sites de terceiros, como lojas e fontes de consulta. Não
+    controlamos esses sites nem respondemos pelo conteúdo deles.
+  </p>
+
+  <h2>Conteúdo</h2>
+  <p>
+    Os textos, tabelas, desenhos e o medidor para imprimir podem ser usados para uso pessoal. Para
+    publicar o conteúdo em outro lugar, cite a fonte com um link para {SITE.domain}.
+  </p>
+
+  <h2>Mudanças</h2>
+  <p>Estes termos podem mudar. A data no topo da página mostra a última atualização.</p>
+</DocLayout>

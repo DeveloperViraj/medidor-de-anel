@@ -1,0 +1,37 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import ContactLine from '../components/ContactLine.astro';
+import { SITE } from '../config/site';
+---
+
+<DocLayout
+  title="Contato"
+  description={`Fale com o ${SITE.name}: erros, tabelas de lojas, sugestões e pedidos sobre privacidade.`}
+  crumb="Contato"
+>
+  <p>
+    Escreva para <ContactLine />. Respondemos em português.
+  </p>
+
+  <h2>Ajuda a deixar o medidor melhor</h2>
+  <ul>
+    <li>
+      <strong>Achou uma loja com outra tabela de aro?</strong> Mande o nome da loja e o link da
+      tabela de medidas. Isso ajuda a manter a página{' '}
+      <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a> em
+      dia.
+    </li>
+    <li>
+      <strong>O resultado não bateu com a loja?</strong> Conte qual aro deu aqui, qual a loja disse
+      e, se souber, a medida em milímetros.
+    </li>
+    <li>
+      <strong>Algo não funcionou no seu celular?</strong> Diga o modelo do aparelho e o navegador.
+    </li>
+  </ul>
+
+  <p>
+    Não vendemos joias e não fazemos ajuste de anéis: para isso, procure a loja onde a peça foi
+    comprada.
+  </p>
+</DocLayout>

@@ -1,0 +1,339 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { formatMm } from '../lib/format';
+import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
+import { circumferenceFromUs, sizeFromCircumference } from '../lib/sizes';
+
+const title = 'Converter Tamanho de Anel: EUA, Europa e Reino Unido para Aro';
+const description =
+  'Converta o tamanho de anel americano, europeu ou britânico para o aro brasileiro, e o contrário, com o diâmetro em mm. Inclui a tabela EUA x Brasil.';
+
+// US sizes people actually buy, converted by the size engine.
+const usRows = [4, 4.5, 5, 5.5, 6, 6.5, 7, 7.5, 8, 8.5, 9, 9.5, 10, 10.5, 11, 11.5, 12].map(
+  (us) => {
+    const size = sizeFromCircumference(circumferenceFromUs(us));
+    return { us, size };
+  },
+);
+const usLabel = (us: number) => (Number.isInteger(us) ? String(us) : `${Math.floor(us)}½`);
+
+const faqs: Faq[] = [
+  {
+    q: 'Tamanho 7 americano é qual aro no Brasil?',
+    a: `O tamanho 7 dos EUA tem ${formatMm(sizeFromCircumference(circumferenceFromUs(7)).diameterMm)} mm de diâmetro interno, que é o aro ${sizeFromCircumference(circumferenceFromUs(7)).aro.aro} na tabela da maioria das joalherias brasileiras.`,
+  },
+  {
+    q: 'O tamanho europeu é igual ao brasileiro?',
+    a: 'Não. O tamanho europeu (ISO 8653) é a volta do dedo em milímetros, e o aro brasileiro mais comum é essa volta menos 40. O tamanho europeu 56 é o aro 16.',
+  },
+  {
+    q: 'E os tamanhos da Shein, AliExpress e Temu?',
+    a: 'Muitos anúncios internacionais mostram o tamanho americano, mas nem todos: confira a tabela do anúncio. Se ela trouxer o diâmetro em milímetros, use a opção "Diâmetro em mm", que não depende de sistema nenhum.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Converter tamanho de anel"
+  description={description}
+  updated="2026-10-24"
+  schema={[
+    webApplication({
+      url: absolute('/converter-tamanho-de-anel'),
+      name: 'Conversor de tamanho de anel',
+      description,
+    }),
+    faqPage(absolute('/converter-tamanho-de-anel'), faqs),
+  ]}
+  wide
+>
+  <div slot="tool" class="conv" data-converter>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,11rem)] sm:items-end">
+      <label class="block min-w-0">
+        <span class="mb-1.5 block text-sm font-semibold text-ink-2">O tamanho que você tem</span>
+        <select class="field" data-conv-system>
+          <option value="us">EUA e Canadá</option>
+          <option value="eu">Europa (ISO)</option>
+          <option value="uk">Reino Unido e Austrália</option>
+          <option value="aro">Aro brasileiro (padrão)</option>
+          <option value="aroB">Aro por diâmetro</option>
+          <option value="diameter">Diâmetro em mm</option>
+        </select>
+      </label>
+      <label class="block min-w-0">
+        <span class="mb-1.5 block text-sm font-semibold text-ink-2">Tamanho</span>
+        <input type="text" autocomplete="off" class="field" placeholder="7½" data-conv-input />
+      </label>
+    </div>
+    <p class="conv-msg" data-conv-msg aria-live="polite"></p>
+    <div class="conv-out" data-conv-out hidden>
+      <p class="eyebrow">No Brasil</p>
+      <p class="conv-aro">
+        <span class="text-2xl text-ink-2">Aro</span>
+        <span class="num" data-out-aro></span>
+      </p>
+      <p class="text-sm text-ink-2" data-out-b></p>
+      <dl class="conv-grid">
+        <div>
+          <dt>Diâmetro interno</dt>
+          <dd class="num" data-out-diameter></dd>
+        </div>
+        <div>
+          <dt>Volta</dt>
+          <dd class="num" data-out-circumference></dd>
+        </div>
+        <div>
+          <dt>EUA e Canadá</dt>
+          <dd class="num" data-out-us></dd>
+        </div>
+        <div>
+          <dt>Europa (ISO)</dt>
+          <dd class="num" data-out-iso></dd>
+        </div>
+        <div>
+          <dt>Reino Unido</dt>
+          <dd class="num" data-out-uk></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <p>
+    Todos os sistemas descrevem o mesmo furo do anel com nomes diferentes. O conversor passa tudo
+    para milímetros e depois para cada tabela, usando as mesmas contas do{' '}
+    <a href="/#medidor">medidor de anel</a>.
+  </p>
+
+  <h2>Tabela de anel EUA x Brasil</h2>
+  <div class="cmp-wrap">
+    <table class="cmp">
+      <thead>
+        <tr>
+          <th scope="col">EUA</th>
+          <th scope="col">Diâmetro</th>
+          <th scope="col">Aro (tabela padrão)</th>
+          <th scope="col">Aro (tabela por diâmetro)</th>
+        </tr>
+      </thead>
+      <tbody>
+        {usRows.map(({ us, size }) => (
+          <tr>
+            <th scope="row" class="num">
+              {usLabel(us)}
+            </th>
+            <td class="num">{formatMm(size.diameterMm)} mm</td>
+            <td class="num">{size.aro.aro}</td>
+            <td class="num">{size.aroScaleB}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Como cada país numera</h2>
+  <ul>
+    <li>
+      <strong>Brasil:</strong> na tabela da maioria das joalherias, o aro é a volta do dedo em mm
+      menos 40. Algumas lojas usam uma tabela por diâmetro, uns 3 números acima para o mesmo anel;
+      veja <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a>.
+    </li>
+    <li>
+      <strong>Europa (ISO 8653), França e Portugal:</strong> o tamanho é a própria volta em
+      milímetros. Cartier e Van Cleef &amp; Arpels, por exemplo, usam essa numeração.
+    </li>
+    <li>
+      <strong>Itália, Espanha e Suíça:</strong> a volta em mm menos 40, igual ao aro padrão.
+    </li>
+    <li>
+      <strong>EUA e Canadá:</strong> números com meios e quartos; cada número inteiro soma 0,8 mm ao
+      diâmetro.
+    </li>
+    <li>
+      <strong>Reino Unido e Austrália:</strong> letras, de A a Z, com meias letras; cada letra soma
+      1,25 mm à volta.
+    </li>
+  </ul>
+  <p>
+    Japão, China e Índia usam tabelas próprias que não seguem uma regra fixa. Para elas, peça o
+    diâmetro interno em milímetros e use a opção &quot;Diâmetro em mm&quot;.
+  </p>
+
+  <ToolCta title="Ainda não sabe o seu tamanho?" />
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>
+
+<script>
+  import { formatMm } from '../lib/format';
+  import { circumferenceFromSystem, sizeFromCircumference, type SizeSystem } from '../lib/sizes';
+
+  const box = document.querySelector<HTMLElement>('[data-converter]');
+  if (box) {
+    const system = box.querySelector<HTMLSelectElement>('[data-conv-system]')!;
+    const input = box.querySelector<HTMLInputElement>('[data-conv-input]')!;
+    const msg = box.querySelector<HTMLElement>('[data-conv-msg]')!;
+    const out = box.querySelector<HTMLElement>('[data-conv-out]')!;
+    const set = (selector: string, text: string) => {
+      box.querySelector<HTMLElement>(selector)!.textContent = text;
+    };
+    const placeholders: Record<SizeSystem, string> = {
+      us: '7½',
+      eu: '54',
+      uk: 'N½',
+      aro: '16',
+      aroB: '16',
+      diameter: '17,3',
+    };
+
+    const update = () => {
+      const raw = input.value;
+      out.hidden = true;
+      msg.textContent = '';
+      if (!raw.trim()) return;
+      const circumference = circumferenceFromSystem(system.value as SizeSystem, raw);
+      if (Number.isNaN(circumference)) {
+        msg.textContent = `Esse tamanho não existe nesse sistema. Exemplo: ${placeholders[system.value as SizeSystem]}.`;
+        return;
+      }
+      const size = sizeFromCircumference(circumference);
+      out.hidden = false;
+      set('[data-out-aro]', String(size.aro.aro));
+      const between = size.aro.between
+        ? `Fica entre o aro ${size.aro.between[0]} e o ${size.aro.between[1]}. `
+        : '';
+      const rare = size.outOfRange
+        ? ' Esse tamanho fica fora da numeração comum (aro 5 a 35); muitas lojas fazem sob encomenda.'
+        : '';
+      set(
+        '[data-out-b]',
+        `${between}Em lojas com tabela por diâmetro: aro ${size.aroScaleB}.${rare}`,
+      );
+      set('[data-out-diameter]', `${formatMm(size.diameterMm)} mm`);
+      set('[data-out-circumference]', `${formatMm(size.circumferenceMm)} mm`);
+      set('[data-out-us]', size.us);
+      set('[data-out-iso]', String(size.iso));
+      set('[data-out-uk]', `≈ ${size.uk}`);
+    };
+
+    // A number typed for one system means something else in the next, so start clean.
+    system.addEventListener('change', () => {
+      input.placeholder = placeholders[system.value as SizeSystem];
+      input.value = '';
+      update();
+      input.focus();
+    });
+    input.addEventListener('input', update);
+  }
+</script>
+
+<style>
+  .conv {
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  .conv-msg {
+    min-height: 1.375rem;
+    margin-top: 0.5rem;
+    font-size: var(--text-sm);
+    color: var(--color-danger);
+  }
+
+  .conv-out[hidden] {
+    display: none;
+  }
+
+  .conv-out {
+    padding-top: 1rem;
+    border-top: 1px solid var(--color-line);
+  }
+
+  .conv-aro {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-family: var(--font-display);
+  }
+
+  .conv-aro .num {
+    font-size: var(--text-6xl);
+    line-height: var(--text-6xl--line-height);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .conv-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .conv-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+
+  .conv-grid > div {
+    min-width: 0;
+    padding: 0.75rem;
+    border-radius: var(--radius-sm);
+    background: var(--color-sunken);
+  }
+
+  .conv-grid dt {
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+  }
+
+  .conv-grid dd {
+    margin-top: 0.125rem;
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .cmp-wrap {
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .cmp {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .cmp th,
+  .cmp td {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .cmp thead th {
+    color: var(--color-ink-3);
+    font-weight: var(--font-weight-semibold);
+    background: var(--color-surface-2);
+  }
+
+  .cmp tbody th {
+    color: var(--color-ink);
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .cmp tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+</style>

@@ -218,7 +218,9 @@ export function initRingSizer(root: HTMLElement): void {
     (!sameScreen(stored.screen, currentScreen()) || zoomMoved(stored.zoom, baseZoom));
   let calMethod: CalibrationMethod = stored?.method ?? 'card';
   let pxPerMm = stored && !calibrationStale ? stored.pxPerMm : guessOnScreenPxPerMm() / baseZoom;
-  let method: Method = 'ring';
+  // Pages can open on another method (the finger page starts on "Pelo dedo").
+  const initial = root.dataset.initialMethod;
+  let method: Method = initial === 'finger' || initial === 'typed' ? initial : 'ring';
   let ringDiameter = Number(ringRange.value);
   let ringTouched = false;
   /** The circumference behind the result on screen, or null when there is none. */

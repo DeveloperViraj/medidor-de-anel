@@ -28,7 +28,11 @@ interface Props {
 
 const { title, description, noindex = false, breadcrumbs, schema = [] } = Astro.props;
 const canonical = absolute(pagePath(Astro.url.pathname));
-const fullTitle = title.includes(SITE.name) ? title : `${title} | ${SITE.name}`;
+// The brand suffix only when the result still fits in a search result (about 60 characters);
+// a descriptive title is worth more than the brand there.
+const suffix = ` | ${SITE.name}`;
+const fullTitle =
+  title.includes(SITE.name) || title.length + suffix.length > 62 ? title : `${title}${suffix}`;
 
 const graph = {
   '@context': 'https://schema.org',

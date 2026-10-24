@@ -1,0 +1,81 @@
+---
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { absolute, faqPage, type Faq } from '../lib/seo';
+
+const title = 'Tamanho do Anel em Segredo: Como Descobrir Sem a Pessoa Saber';
+const description =
+  'Vai fazer surpresa com um anel ou um pedido de casamento? Veja como descobrir o aro sem a pessoa saber, do jeito mais seguro ao último recurso.';
+
+const faqs: Faq[] = [
+  {
+    q: 'Posso usar um anel de outro dedo?',
+    a: 'Só como último recurso. Cada dedo tem um tamanho, e o anelar costuma ser diferente do médio e do indicador. Um anel do mesmo dedo, e da mesma mão, dá o número certo.',
+  },
+  {
+    q: 'E se eu errar o tamanho?',
+    a: 'Antes de comprar, pergunte se a loja faz ajuste ou troca de tamanho e quanto custa. Prefira um aro um pouco maior e um modelo fino, que são mais fáceis de ajustar, e evite aço inox, que normalmente não pode ser ajustado.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Como descobrir o tamanho do anel em segredo"
+  description={description}
+  updated="2026-10-24"
+  schema={[faqPage(absolute('/como-descobrir-tamanho-de-anel-em-segredo'), faqs)]}
+>
+  <h2>1. Pegue emprestado um anel do mesmo dedo</h2>
+  <p>
+    É o jeito com mais chance de acertar. Escolha um anel que a pessoa usa no dedo em que o novo vai
+    ficar, de preferência na mesma mão. Antes de pegar, tire uma foto da caixinha ou do lugar onde
+    ele estava, para devolver do mesmo jeito.
+  </p>
+  <p>
+    Com o anel em mãos, meça o diâmetro de dentro no <a href="/#medidor">medidor de anel online</a>:
+    calibre a tela com um cartão, deite o anel no círculo e ajuste. Leva menos de um minuto, e o
+    anel volta para o lugar antes de alguém notar.
+  </p>
+
+  <h2>2. Sem tempo para medir? Desenhe o anel</h2>
+  <p>
+    Apoie o anel numa folha e contorne a parte de dentro com um lápis bem apontado, mantendo o lápis
+    em pé. Depois meça o diâmetro do círculo desenhado com uma régua, passando pelo centro. É menos
+    preciso que medir o anel, porque o traço do lápis tem espessura, mas dá uma boa ideia.
+  </p>
+
+  <h2>3. Marca do anel num sabonete ou massinha</h2>
+  <p>
+    Pressione o anel deitado num sabonete ou em massinha de modelar, sem girar, e meça o círculo de
+    dentro da marca depois, com calma. Funciona quando não dá para levar o anel, mas a marca pode
+    deformar: use como confirmação, não como única medida.
+  </p>
+
+  <h2>4. Peça ajuda a quem sabe</h2>
+  <p>
+    Amigos e família podem saber o número, ou ajudar a descobrir, por exemplo provando anéis junto
+    com a pessoa numa loja.
+  </p>
+
+  <h2>Se nada disso der certo</h2>
+  <ul>
+    <li>Escolha um modelo fino, que é mais fácil de ajustar depois.</li>
+    <li>Na dúvida entre dois números, fique com o maior: apertar é mais fácil que alargar.</li>
+    <li>Compre numa loja que faça ajuste ou a primeira troca de tamanho sem custo.</li>
+    <li>Evite aço inox, que normalmente não pode ser ajustado.</li>
+    <li>
+      Confira a tabela da loja: no Brasil existem duas tabelas de aro, veja{' '}
+      <a href="/por-que-o-aro-muda-de-loja-para-loja">por que o aro muda de loja para loja</a>.
+    </li>
+  </ul>
+
+  <ToolCta
+    title="Pegou o anel emprestado?"
+    text="Meça agora na tela, em menos de um minuto, e devolva o anel antes que alguém perceba."
+  />
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>

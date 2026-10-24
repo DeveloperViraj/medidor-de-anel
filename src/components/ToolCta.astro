@@ -1,0 +1,50 @@
+---
+/** A short invitation back to the sizer, for guide pages. */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  title?: string;
+  text?: string;
+  href?: string;
+  label?: string;
+}
+
+const {
+  title = 'Meça agora na tela do celular',
+  text = 'Calibre com um cartão ou uma moeda de R$ 1 e descubra o aro em menos de um minuto. Grátis, sem cadastro.',
+  href = '/#medidor',
+  label = 'Abrir o medidor',
+} = Astro.props;
+---
+
+<aside class="cta">
+  <div class="min-w-0">
+    <p class="font-display text-xl font-semibold text-ink">{title}</p>
+    <p class="mt-1 text-sm text-ink-2">{text}</p>
+  </div>
+  <a href={href} class="btn btn-solid shrink-0">
+    {label}
+    <Icon name="lucide:arrow-right" class="size-4" aria-hidden="true" />
+  </a>
+</aside>
+
+<style>
+  .cta {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    margin: 2rem 0;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @media (min-width: 640px) {
+    .cta {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+</style>

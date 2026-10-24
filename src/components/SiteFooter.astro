@@ -1,32 +1,41 @@
 ---
 import { SITE } from '../config/site';
-import { FOOTER_NAV } from '../lib/nav';
+import { ABOUT_NAV, GUIDE_NAV, PRIMARY_NAV } from '../lib/nav';
 import Logo from './Logo.astro';
+
+const columns = [
+  { title: 'Medir', items: [{ href: '/', label: 'Medidor de anel online' }, ...PRIMARY_NAV] },
+  { title: 'Guias', items: GUIDE_NAV },
+  { title: 'O site', items: ABOUT_NAV },
+];
 ---
 
 <footer class="mt-20 border-t border-line bg-canvas-2">
-  <div class="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 py-10 sm:grid-cols-[minmax(0,1fr)_auto]">
+  <div class="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-[minmax(0,1.2fr)_repeat(3,minmax(0,1fr))]">
     <div class="min-w-0">
       <a href="/" class="flex items-center gap-2.5 text-ink no-underline">
         <Logo class="size-7 shrink-0" />
         <span class="font-display text-lg font-semibold">{SITE.name}</span>
       </a>
-      <p class="mt-3 max-w-md text-sm text-ink-2">
+      <p class="mt-3 max-w-xs text-sm text-ink-2">
         Sem cadastro, sem app, sem cobrança. A medida fica no seu aparelho: nada do que você mede é
         enviado para nós.
       </p>
     </div>
-    <nav aria-label="Rodapé" class="min-w-0">
-      <ul class="space-y-2 text-sm">
-        {FOOTER_NAV.map((item) => (
-          <li>
-            <a href={item.href} class="text-ink-2 no-underline hover:text-ink hover:underline">
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    {columns.map((column) => (
+      <nav aria-label={column.title} class="min-w-0">
+        <p class="text-sm font-semibold text-ink">{column.title}</p>
+        <ul class="mt-3 space-y-2 text-sm">
+          {column.items.map((item) => (
+            <li>
+              <a href={item.href} class="text-ink-2 no-underline hover:text-ink hover:underline">
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ))}
   </div>
   <div class="border-t border-line">
     <p class="mx-auto max-w-5xl px-4 py-5 text-xs text-ink-3">

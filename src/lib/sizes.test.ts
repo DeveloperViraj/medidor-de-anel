@@ -5,6 +5,7 @@ import {
   aroTable,
   circumferenceFromAro,
   circumferenceFromDiameter,
+  circumferenceFromSystem,
   circumferenceFromUkIndex,
   circumferenceFromUs,
   diameterFromAroScaleB,
@@ -13,6 +14,8 @@ import {
   formatUs,
   isPlausibleCircumference,
   nearestAro,
+  parseUkSize,
+  parseUsSize,
   sizeFromCircumference,
   sizeFromDiameter,
   storeAro,
@@ -206,6 +209,88 @@ describe('aroTable', () => {
     expect(aro16.diameterMm).toBeCloseTo(17.83, 2);
     expect(aro16.diameterScaleBMm).toBeCloseTo(16.8, 2);
     expect(aro16.us).toBe('7½');
+  });
+});
+
+describe('parseUsSize', () => {
+  it.each([
+    ['7', 7],
+    ['7,5', 7.5],
+    ['7.5', 7.5],
+    ['7½', 7.5],
+    ['7 ½', 7.5],
+    ['7 1/2', 7.5],
+    ['7 3/4', 7.75],
+    ['7 1/4', 7.25],
+    ['½', 0.5],
+    [' 10 ', 10],
+  ])('reads %s', (input, value) => {
+    expect(parseUsSize(input)).toBe(value);
+  });
+
+  it.each(['', 'sete', '7 5/4', '7/2', '123', '7..5'])('rejects %s', (input) => {
+    expect(parseUsSize(input)).toBeNaN();
+  });
+
+  it('feeds the US formula: US 7 (54,4 mm around) is aro 14', () => {
+    expect(sizeFromCircumference(circumferenceFromUs(parseUsSize('7'))).aro.aro).toBe(14);
+  });
+});
+
+describe('parseUkSize', () => {
+  it.each([
+    ['A', 0],
+    ['n', 13],
+    ['N½', 13.5],
+    ['N 1/2', 13.5],
+    ['Z', 25],
+    ['Z+2', 27],
+    ['z2', 27],
+  ])('reads %s', (input, value) => {
+    expect(parseUkSize(input)).toBe(value);
+  });
+
+  it.each(['', 'NN', 'N¼', 'Z+9', '14'])('rejects %s', (input) => {
+    expect(parseUkSize(input)).toBeNaN();
+  });
+
+  it('round-trips through formatUk', () => {
+    for (const letter of ['F', 'K½', 'P', 'T½', 'Z', 'Z+3']) {
+      expect(formatUk(parseUkSize(letter))).toBe(letter);
+    }
+  });
+});
+
+describe('circumferenceFromSystem (the converter)', () => {
+  it.each([
+    ['aro', '16', 56],
+    ['eu', '56', 56],
+    ['diameter', '17,83', 17.83 * Math.PI],
+    ['aroB', '19', 17.8 * Math.PI],
+    ['us', '7 1/2', circumferenceFromUs(7.5)],
+    ['uk', 'P', circumferenceFromUkIndex(15)],
+  ] as const)('%s %s', (system, input, expected) => {
+    expect(circumferenceFromSystem(system, input)).toBeCloseTo(expected, 2);
+  });
+
+  it('agrees across systems for one ring', () => {
+    // A scale-A aro 16 ring read back through every system lands on aro 16.
+    const ring = circumferenceFromAro(16);
+    const viaEu = circumferenceFromSystem('eu', String(ring));
+    const viaDiameter = circumferenceFromSystem('diameter', String(ring / Math.PI));
+    expect(sizeFromCircumference(viaEu).aro.aro).toBe(16);
+    expect(sizeFromCircumference(viaDiameter).aro.aro).toBe(16);
+  });
+
+  it.each([
+    ['aro', ''],
+    ['aro', 'dezesseis'],
+    ['eu', '5,6'], // centimetres typed where millimetres are expected
+    ['us', '40'],
+    ['uk', '7'],
+    ['diameter', '56'], // a circumference typed as a diameter
+  ] as const)('rejects %s "%s"', (system, input) => {
+    expect(circumferenceFromSystem(system, input)).toBeNaN();
   });
 });
 

@@ -1,0 +1,114 @@
+---
+/**
+ * The aro table, from the tested size engine. Extra columns are opt-in so the home page can stay
+ * compact while the full table page shows every system and the scale-B diameter.
+ */
+import { formatMm, formatMm2 } from '../lib/format';
+import { aroTable } from '../lib/sizes';
+
+interface Props {
+  from?: number;
+  to?: number;
+  uk?: boolean;
+  /** The diameter the same aro number has on the diameter table some shops use. */
+  scaleB?: boolean;
+  caption?: string;
+}
+
+const { from = 10, to = 30, uk = false, scaleB = false, caption } = Astro.props;
+const rows = aroTable(from, to);
+---
+
+<div class="table-wrap">
+  <table class="aro-table">
+    {caption && <caption class="sr-only">{caption}</caption>}
+    <thead>
+      <tr>
+        <th scope="col">Aro</th>
+        <th scope="col">Diâmetro interno</th>
+        <th scope="col">Volta</th>
+        <th scope="col">EUA</th>
+        {uk && <th scope="col">Reino Unido</th>}
+        {scaleB && <th scope="col">Mesmo aro na tabela por diâmetro</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((row) => (
+        <tr id={`aro-${row.aro}`}>
+          <th scope="row">{row.aro}</th>
+          <td class="num">{formatMm2(row.diameterMm)} mm</td>
+          <td class="num">
+            {row.circumferenceMm} mm{' '}
+            <span class="cell-sub">{formatMm(row.circumferenceMm / 10)} cm</span>
+          </td>
+          <td class="num">{row.us}</td>
+          {uk && <td class="num">≈ {row.uk}</td>}
+          {scaleB && <td class="num">{formatMm(row.diameterScaleBMm)} mm</td>}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .table-wrap {
+    overflow-x: auto;
+    margin: 1rem 0 1.5rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+  }
+
+  .aro-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-sm);
+  }
+
+  .aro-table th,
+  .aro-table td {
+    padding: 0.5rem;
+    text-align: left;
+    border-bottom: 1px solid var(--color-line);
+    white-space: nowrap;
+  }
+
+  @media (min-width: 640px) {
+    .aro-table th,
+    .aro-table td {
+      padding: 0.5rem 0.875rem;
+    }
+  }
+
+  .aro-table thead th {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink-3);
+    background: var(--color-surface-2);
+    white-space: normal;
+    vertical-align: bottom;
+  }
+
+  .aro-table tbody th {
+    font-family: var(--font-display);
+    font-size: var(--text-base);
+    color: var(--color-ink);
+  }
+
+  .aro-table tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  .aro-table tbody tr:target {
+    background: var(--color-gold-soft);
+  }
+
+  .aro-table td {
+    color: var(--color-ink-2);
+  }
+
+  .cell-sub {
+    display: block;
+    font-size: var(--text-xs);
+    color: var(--color-ink-3);
+  }
+</style>
