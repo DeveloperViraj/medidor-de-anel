@@ -1,0 +1,124 @@
+---
+import { Icon } from 'astro-icon/components';
+import DocLayout from '../layouts/DocLayout.astro';
+import FaqList from '../components/FaqList.astro';
+import ToolCta from '../components/ToolCta.astro';
+import { faqPage, absolute, type Faq } from '../lib/seo';
+import { PRINT_ARO_FROM, PRINT_ARO_TO } from '../lib/printable';
+
+const title = 'Medidor de Anel para Imprimir – PDF Grátis em Tamanho Real';
+const description = `Baixe o medidor de anel em PDF, grátis: círculos do aro ${PRINT_ARO_FROM} ao ${PRINT_ARO_TO}, tira para o dedo e régua de conferência. Imprima em tamanho real e descubra o aro em casa.`;
+
+const faqs: Faq[] = [
+  {
+    q: 'O medidor de anel para imprimir é confiável?',
+    a: 'É, desde que a folha saia em tamanho real. Por isso o PDF traz um contorno de cartão e uma régua de 10 cm: se o cartão encaixa e a régua mede 10 cm, os círculos e a tira estão no tamanho certo.',
+  },
+  {
+    q: 'Posso imprimir em papel Carta em vez de A4?',
+    a: 'Pode. O conteúdo fica dentro da área que cabe nos dois tamanhos de folha. O importante é imprimir em 100%, sem ajustar à página.',
+  },
+  {
+    q: 'Qual tabela de aro o PDF usa?',
+    a: 'A tabela da maioria das joalherias: o número do aro é a volta do dedo em milímetros menos 40. Cada círculo também traz o diâmetro em milímetros, para comparar com a tabela da loja.',
+  },
+  {
+    q: 'Não tenho impressora. E agora?',
+    a: 'Use o medidor na tela do celular: você calibra com um cartão ou uma moeda de R$ 1 e mede o anel ou o dedo sem imprimir nada.',
+  },
+];
+---
+
+<DocLayout
+  title={title}
+  heading="Medidor de anel para imprimir"
+  description={description}
+  updated="2026-10-24"
+  schema={[faqPage(absolute('/medidor-de-anel-para-imprimir'), faqs)]}
+>
+  <div slot="tool" class="download">
+    <div class="min-w-0">
+      <p class="font-display text-xl font-semibold text-ink">Medidor de anel em PDF</p>
+      <p class="mt-1 text-sm text-ink-2">
+        1 página A4 · círculos do aro {PRINT_ARO_FROM} ao {PRINT_ARO_TO} · tira para o dedo · régua
+        e contorno de cartão para conferir
+      </p>
+    </div>
+    <a
+      href="/medidor-de-anel-para-imprimir.pdf"
+      download="medidor-de-anel.pdf"
+      class="btn btn-solid shrink-0"
+    >
+      <Icon name="lucide:download" class="size-5" aria-hidden="true" />
+      Baixar o PDF
+    </a>
+  </div>
+
+  <h2>Como imprimir em tamanho real</h2>
+  <ol>
+    <li>Abra o PDF e mande imprimir.</li>
+    <li>
+      Na janela de impressão, procure <strong>Escala</strong> e escolha <strong>100%</strong> ou{' '}
+      <strong>Tamanho real</strong>.
+    </li>
+    <li>
+      Desmarque <strong>Ajustar à página</strong> ou <strong>Ajustar à área de impressão</strong>,
+      se aparecer. Essa opção encolhe tudo um pouco e estraga a medida.
+    </li>
+  </ol>
+
+  <h2>Confira antes de usar</h2>
+  <p>
+    A primeira parte da folha serve para isso. Coloque um cartão de crédito ou débito em cima do
+    contorno: ele deve cobrir a linha por inteiro. Depois meça a régua impressa com uma régua de
+    verdade: ela deve ter exatamente 10 cm. Se o cartão sobrar ou faltar, ou se a régua não der 10
+    cm, a impressora mudou o tamanho. Imprima de novo em 100% antes de confiar nos círculos.
+  </p>
+
+  <h2>Com um anel que já serve</h2>
+  <p>
+    Apoie o anel sobre os círculos, um de cada vez. O tamanho certo é o círculo cuja linha fica
+    exatamente na borda de dentro do anel: nem aparecendo por dentro, nem escondida embaixo do
+    metal. Cada círculo traz o número do aro e o diâmetro em milímetros. Ficou entre dois? Escolha o
+    maior.
+  </p>
+
+  <h2>Pelo dedo, com a tira</h2>
+  <p>
+    Recorte a tira pela linha tracejada e enrole na base do dedo em que o anel vai ficar, com a
+    escala para fora. O aro é o número da escala no ponto onde o começo da tira encontra a escala. A
+    tira tem uma marca para cada aro, do 5 ao 35, e números a cada cinco.
+  </p>
+  <p>
+    Papel não estica, por isso dá uma medida melhor que barbante. Meça no fim do dia, com a mão em
+    temperatura normal, e confira se a tira passa pela junta do dedo.
+  </p>
+
+  <ToolCta
+    title="Não quer imprimir?"
+    text="O medidor na tela faz o mesmo no celular: calibre com um cartão e meça o anel ou o dedo, sem papel."
+  />
+
+  <h2>Perguntas frequentes</h2>
+  <FaqList faqs={faqs} />
+</DocLayout>
+
+<style>
+  .download {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-md);
+  }
+
+  @media (min-width: 640px) {
+    .download {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+</style>
