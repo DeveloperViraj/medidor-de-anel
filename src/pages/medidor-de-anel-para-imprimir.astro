@@ -6,7 +6,7 @@ import ToolCta from '../components/ToolCta.astro';
 import { faqPage, absolute, type Faq } from '../lib/seo';
 import { PRINT_ARO_FROM, PRINT_ARO_TO } from '../lib/printable';
 
-const title = 'Medidor de Anel para Imprimir – PDF Grátis em Tamanho Real';
+const title = 'Medidor de Anel para Imprimir: PDF Grátis em Tamanho Real';
 const description = `Baixe o medidor de anel em PDF, grátis: círculos do aro ${PRINT_ARO_FROM} ao ${PRINT_ARO_TO}, tira para o dedo e régua de conferência. Imprima em tamanho real e descubra o aro em casa.`;
 
 const faqs: Faq[] = [
@@ -33,7 +33,6 @@ const faqs: Faq[] = [
   title={title}
   heading="Medidor de anel para imprimir"
   description={description}
-  updated="2026-10-24"
   schema={[faqPage(absolute('/medidor-de-anel-para-imprimir'), faqs)]}
 >
   <div slot="tool" class="download">

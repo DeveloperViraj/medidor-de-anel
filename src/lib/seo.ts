@@ -119,31 +119,6 @@ export function webApplication(opts: {
   };
 }
 
-/**
- * A guide page. Credited to the publisher, not a person: there is no named author until the owner
- * chooses one, and an invented expert would be worse than none.
- */
-export function article(opts: {
-  url: string;
-  headline: string;
-  description: string;
-  datePublished: string;
-  dateModified: string;
-}): JsonLdNode {
-  return {
-    '@type': 'Article',
-    '@id': `${opts.url}#article`,
-    headline: opts.headline,
-    description: opts.description,
-    datePublished: opts.datePublished,
-    dateModified: opts.dateModified,
-    inLanguage: SITE.locale,
-    mainEntityOfPage: { '@id': `${opts.url}#webpage` },
-    author: { '@id': ORGANIZATION_ID },
-    publisher: { '@id': ORGANIZATION_ID },
-  };
-}
-
 export interface Faq {
   q: string;
   /** Plain text: the same words the page shows. */

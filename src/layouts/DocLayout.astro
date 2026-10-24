@@ -1,11 +1,11 @@
 ---
 /**
  * Guide and reference pages: breadcrumbs, the title, an intro line, then a single reading column.
- * Dated pages become an Article in the structured data; legal pages carry no date.
+ * No "updated on" date: the owner prefers pages without one.
  */
 import BaseLayout from './BaseLayout.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import { absolute, article, pagePath, type Crumb, type JsonLdNode } from '../lib/seo';
+import { pagePath, type Crumb, type JsonLdNode } from '../lib/seo';
 
 interface Props {
   /** The <title>; also the H1 unless `heading` is given. */
@@ -13,10 +13,6 @@ interface Props {
   /** A shorter H1 when the title carries extra search words. */
   heading?: string;
   description: string;
-  /** ISO date the content was last materially changed. Legal pages leave it out. */
-  updated?: string;
-  /** ISO date the page first went live. Defaults to `updated`. */
-  published?: string;
   /** Breadcrumb name for this page, when the H1 is too long for the trail. */
   crumb?: string;
   noindex?: boolean;
@@ -29,8 +25,6 @@ const {
   title,
   heading = title,
   description,
-  updated,
-  published = updated,
   crumb = heading,
   noindex,
   schema = [],
@@ -42,23 +36,6 @@ const breadcrumbs: Crumb[] = [
   { name: 'Início', path: '/' },
   { name: crumb, path },
 ];
-const articleNode =
-  updated && published
-    ? [
-        article({
-          url: absolute(path),
-          headline: heading,
-          description,
-          datePublished: published,
-          dateModified: updated,
-        }),
-      ]
-    : [];
-const updatedLabel = updated
-  ? new Intl.DateTimeFormat('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' }).format(
-      new Date(`${updated}T12:00:00Z`),
-    )
-  : null;
 ---
 
 <BaseLayout
@@ -66,17 +43,12 @@ const updatedLabel = updated
   description={description}
   noindex={noindex}
   breadcrumbs={breadcrumbs}
-  schema={[...articleNode, ...schema]}
+  schema={schema}
 >
   <article class:list={['mx-auto px-4 pt-8 sm:pt-12', wide ? 'max-w-3xl' : 'max-w-2xl']}>
     <Breadcrumbs crumbs={breadcrumbs} />
     <h1 class="mt-4 text-4xl sm:text-5xl">{heading}</h1>
     <p class="mt-4 text-lg text-ink-2">{description}</p>
-    {updatedLabel && (
-      <p class="mt-3 text-sm text-ink-3">
-        Atualizado em <time datetime={updated}>{updatedLabel}</time>
-      </p>
-    )}
     {/* A tool (the sizer, a converter) sits outside the prose styles, which would restyle it. */}
     {Astro.slots.has('tool') && (
       <div class="mt-8">
