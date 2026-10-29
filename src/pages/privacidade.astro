@@ -9,13 +9,16 @@ import { SITE } from '../config/site';
   description={`Como o ${SITE.name} trata os seus dados: as medidas ficam no seu aparelho, o site não usa cookies e não pede cadastro.`}
   crumb="Privacidade"
 >
-  <p class="text-sm">Última atualização: 24 de outubro de 2026.</p>
+  <p class="text-sm">Última atualização: 29 de outubro de 2026.</p>
 
   <h2>Resumo</h2>
   <ul>
     <li>Não pedimos cadastro, nome, e-mail ou telefone para usar o medidor.</li>
     <li>As medidas são calculadas no seu aparelho e não são enviadas para nós.</li>
-    <li>O site não usa cookies nem ferramentas de estatística ou de anúncios.</li>
+    <li>
+      O site não usa cookies nem mostra anúncios. Contamos as visitas com o Cloudflare Web
+      Analytics, que não usa cookies e só mostra totais.
+    </li>
   </ul>
 
   <h2>Quem é o responsável</h2>
@@ -48,21 +51,48 @@ import { SITE } from '../config/site';
     Brasil. Não usamos esses dados para identificar você nem para mostrar publicidade.
   </p>
 
-  <h2>Estatísticas e anúncios</h2>
+  <h2>Estatísticas de visitas</h2>
   <p>
-    Hoje o site não usa nenhuma ferramenta de estatística nem de anúncios. Se isso mudar, esta
-    página será atualizada antes, e qualquer recurso que dependa do seu consentimento só será
-    ativado depois que você concordar.
+    Para saber quantas pessoas usam o site e quais páginas ajudam mais, usamos o{' '}
+    <a href="https://www.cloudflare.com/web-analytics/" rel="noopener">
+      Cloudflare Web Analytics
+    </a>
+    . Um pequeno script da Cloudflare registra cada visita a uma página: o endereço da página, o
+    site de onde você veio, o país, o navegador, o sistema e o tipo de aparelho, e quanto tempo a
+    página levou para carregar. Nós vemos só totais, como visitas por dia.
+  </p>
+  <p>
+    Segundo a Cloudflare, o Web Analytics não usa cookies nem guarda nada no seu aparelho, não
+    acompanha visitantes de um site para outro e{' '}
+    <a href="https://developers.cloudflare.com/web-analytics/faq/" rel="noopener">
+      não registra a parte do endereço depois do &quot;?&quot;
+    </a>
+    . Por isso as medidas que vão nos links compartilhados não entram nessas estatísticas.
+  </p>
+
+  <h2>Anúncios</h2>
+  <p>
+    Hoje o site não mostra anúncios. Se isso mudar, esta página será atualizada antes, e qualquer
+    recurso que dependa do seu consentimento só será ativado depois que você concordar.
+  </p>
+
+  <h2>Quando você escreve para nós</h2>
+  <p>
+    Se você mandar um e-mail para <ContactLine />, recebemos o seu endereço de e-mail e o que você
+    escrever. Usamos isso só para responder e não passamos para ninguém. A mensagem passa pelo
+    encaminhamento de e-mail da Cloudflare e fica guardada na nossa caixa de e-mail, no Gmail, do
+    Google.
   </p>
 
   <h2>Seus direitos</h2>
   <p>
     A LGPD garante a você, entre outros, o direito de saber se tratamos dados seus, de acessá-los,
-    de corrigi-los e de pedir que sejam apagados. Como o site não guarda dados pessoais em
-    servidores próprios, na prática não há o que consultar ou apagar do nosso lado. Mesmo assim,
-    você pode fazer qualquer pedido pelo contato acima.
+    de corrigi-los e de pedir que sejam apagados. Fora as mensagens que você mandar por e-mail, o
+    site não guarda dados pessoais, então na maioria dos casos não há o que consultar ou apagar do
+    nosso lado. Mesmo assim, você pode fazer qualquer pedido pelo contato acima, inclusive para
+    apagar uma mensagem que você mandou.
   </p>
 
   <h2>Crianças</h2>
-  <p>O site não é direcionado a crianças e não coleta dados de ninguém, de nenhuma idade.</p>
+  <p>O site não é direcionado a crianças e não pede dados pessoais a ninguém.</p>
 </DocLayout>

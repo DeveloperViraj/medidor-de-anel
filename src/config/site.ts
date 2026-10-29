@@ -9,8 +9,8 @@ export const SITE = {
   domain: 'medidordeanel.com',
   url: 'https://medidordeanel.com',
   tagline: 'Medidor de anel online grátis',
-  /** Empty until the owner approves a contact address; the contact page explains the wait. */
-  contactEmail: '',
+  /** Cloudflare Email Routing forwards it to the owner's inbox, which is never published. */
+  contactEmail: 'contato@medidordeanel.com',
   /**
    * Google Search Console's HTML-tag verification code (the content="..." value). Empty because the
    * Domain property verifies through Cloudflare DNS; the tag is only emitted when this is set.
