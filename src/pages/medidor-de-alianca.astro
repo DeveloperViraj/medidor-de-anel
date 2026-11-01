@@ -2,7 +2,9 @@
 import DocLayout from '../layouts/DocLayout.astro';
 import CouplePanel from '../components/CouplePanel.astro';
 import FaqList from '../components/FaqList.astro';
+import PartnerShop from '../components/PartnerShop.astro';
 import RingSizer from '../components/RingSizer.astro';
+import { awinLink, PARTNERS } from '../lib/partners';
 import { absolute, faqPage, webApplication, type Faq } from '../lib/seo';
 
 const title = 'Medidor de Aliança Online: Meça o Aro dos Dois na Tela';
@@ -48,6 +50,25 @@ const schema = [
   <div slot="tool">
     <RingSizer />
     <CouplePanel />
+    <PartnerShop
+      title="Alianças em par, com o aro de cada um"
+      href={awinLink(
+        PARTNERS.aliancasImperiais,
+        'https://www.aliancasimperiais.com.br/alianca-de-casamento',
+        'alianca-page',
+      )}
+      label="Ver alianças na Alianças Imperiais"
+    >
+      <p>
+        Na Alianças Imperiais você escolhe o número de cada aliança do par separadamente, do aro 11
+        ao 35. Se o tamanho não servir, a primeira troca é grátis quando pedida em até 7 dias depois
+        de receber.
+      </p>
+      <p>
+        Antes de fechar o pedido, confira se o aro da loja bate com a sua medida em milímetros: eles
+        atendem pelo WhatsApp.
+      </p>
+    </PartnerShop>
   </div>
 
   <h2>Como medir para a aliança</h2>

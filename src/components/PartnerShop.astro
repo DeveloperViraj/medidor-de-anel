@@ -1,0 +1,78 @@
+---
+/**
+ * A clearly labelled partner-shop suggestion. The link is marked sponsored for search engines and
+ * the note under it tells people, in plain words, that a purchase can earn the site a commission.
+ */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+  title: string;
+  href: string;
+  label: string;
+}
+
+const { title, href, label } = Astro.props;
+---
+
+<aside class="shop" aria-label="Onde comprar">
+  <p class="eyebrow">Onde comprar</p>
+  <p class="shop-title">{title}</p>
+  <div class="shop-text">
+    <slot />
+  </div>
+  <a href={href} class="btn btn-solid mt-4" rel="sponsored noopener" target="_blank">
+    {label}
+    <Icon name="lucide:external-link" class="size-4" aria-hidden="true" />
+  </a>
+  <p class="shop-note">
+    Link de parceiro: se você comprar por ele, podemos ganhar uma comissão, sem custo extra para
+    você. <a href="/sobre#como-o-site-se-mantem">Como o site se mantém</a>.
+  </p>
+</aside>
+
+<style>
+  .shop {
+    margin-top: 1.25rem;
+    padding: 1rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--color-line);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  @media (min-width: 640px) {
+    .shop {
+      padding: 1.5rem;
+    }
+  }
+
+  .shop-title {
+    margin-top: 0.25rem;
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    line-height: var(--text-2xl--line-height);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-ink);
+  }
+
+  .shop-text {
+    margin-top: 0.5rem;
+    color: var(--color-ink-2);
+  }
+
+  .shop-text :global(p + p) {
+    margin-top: 0.5rem;
+  }
+
+  .shop-note {
+    margin-top: 0.75rem;
+    font-size: var(--text-xs);
+    line-height: var(--text-xs--line-height);
+    color: var(--color-ink-3);
+  }
+
+  .shop-note a {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>
