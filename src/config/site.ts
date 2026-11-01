@@ -11,6 +11,11 @@ export const SITE = {
   tagline: 'Medidor de anel online grátis',
   /** Cloudflare Email Routing forwards it to the owner's inbox, which is never published. */
   contactEmail: 'contato@medidordeanel.com',
+  /** Where readers can chip in to keep the site free. Linked from the footer, Sobre and the result. */
+  support: {
+    label: 'Me pague um café',
+    url: 'https://buymeacoffee.com/developerviraj',
+  },
   /**
    * Google Search Console's HTML-tag verification code (the content="..." value). Empty because the
    * Domain property verifies through Cloudflare DNS; the tag is only emitted when this is set.

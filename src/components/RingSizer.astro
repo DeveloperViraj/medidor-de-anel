@@ -7,6 +7,7 @@
  * calibration is remembered when localStorage is available and simply asked for again when not.
  */
 import { Icon } from 'astro-icon/components';
+import SupportLink from './SupportLink.astro';
 
 interface Props {
   /** The method selected when the page opens. */
@@ -451,6 +452,9 @@ const { initialMethod = 'ring' } = Astro.props;
         Medir de novo
       </button>
     </div>
+    <p class="mt-4 text-sm text-ink-2 print:hidden">
+      Achou útil? <SupportLink variant="inline" />
+    </p>
   </div>
 </section>
 

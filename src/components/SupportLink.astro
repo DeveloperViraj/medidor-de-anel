@@ -1,0 +1,42 @@
+---
+/**
+ * "Me pague um café" (SITE.support). A plain link to the Buy Me a Coffee page rather than their
+ * widget script, so nothing loads from their servers until someone chooses to click. It opens in a
+ * new tab, so a measurement in progress is not lost.
+ *
+ * `pill` is the gold button for the footer and the about page; `inline` is a quiet text link for
+ * the result.
+ */
+import { Icon } from 'astro-icon/components';
+import { SITE } from '../config/site';
+
+interface Props {
+  variant?: 'pill' | 'inline';
+  class?: string;
+}
+
+const { variant = 'pill', class: className } = Astro.props;
+---
+
+<a
+  href={SITE.support.url}
+  target="_blank"
+  rel="noopener"
+  class:list={[
+    'print:hidden',
+    variant === 'pill'
+      ? 'inline-flex items-center gap-2 rounded-pill border border-gold/40 bg-gold-soft px-3.5 py-1.5 text-sm font-semibold text-gold-ink no-underline transition-colors hover:border-gold hover:bg-gold/25'
+      : 'inline-flex items-center gap-1.5 font-semibold text-gold-ink underline-offset-4 hover:underline',
+    className,
+  ]}
+>
+  <Icon
+    name="lucide:coffee"
+    class={variant === 'pill' ? 'size-4' : 'size-3.5'}
+    aria-hidden="true"
+  />
+  <span>
+    {SITE.support.label}
+    <span class="sr-only"> (abre em nova aba)</span>
+  </span>
+</a>

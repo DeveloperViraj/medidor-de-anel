@@ -2,6 +2,7 @@
 import { SITE } from '../config/site';
 import { ABOUT_NAV, GUIDE_NAV, PRIMARY_NAV } from '../lib/nav';
 import Logo from './Logo.astro';
+import SupportLink from './SupportLink.astro';
 
 const columns = [
   { title: 'Medir', items: [{ href: '/', label: 'Medidor de anel online' }, ...PRIMARY_NAV] },
@@ -21,6 +22,8 @@ const columns = [
         Sem cadastro, sem app, sem cobrança. A medida fica no seu aparelho: nada do que você mede é
         enviado para nós.
       </p>
+      <p class="mt-4 text-sm text-ink-2 print:hidden">Se te ajudou:</p>
+      <SupportLink class="mt-2" />
     </div>
     {columns.map((column) => (
       <nav aria-label={column.title} class="min-w-0">
